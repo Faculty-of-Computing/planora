@@ -1,38 +1,24 @@
-# Planora – Backend
+# Planora
 
 ![School Project](https://img.shields.io/badge/School%20Project-✔️-blue)
 
-This is the **backend** of **Planora**, a simple event management system built with **Flask** and **SQLite**.
-It provides API endpoints to retrieve and manage events stored in a lightweight SQLite database.
+🎓 **School project** – Event Management System built with **Flask (Python)** and **SQLite**, featuring a **frontend built with HTML, CSS, and JavaScript** served via Flask templates. Provides a backend API for managing events, users, and bookings with a simple, lightweight architecture.
 
 ---
 
 ## 🚀 Features
 
-- Minimal Flask server with basic API routes
-- Uses SQLite for lightweight storage
-- Simple setup for school demonstration of client-server relationship
+- Flask backend with SQLite database
+- Frontend served from Flask templates with static assets
+- API endpoints for events, users, and bookings
 
 ---
 
 ## 🛠️ Tech Stack
 
-- Python 3.x
-- Flask
-- SQLite (no ORM or migrations)
-
----
-
-## 🧩 Recommended VS Code Extensions
-
-This project is preconfigured with code formatting and helpful extensions:
-
-- Python development (`ms-python.black-formatter`, `ms-python.vscode-pylance`, `ms-python.debugpy`, etc.)
-- API testing with [Thunder Client](https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client)
-- SQLite database browsing with [SQLite Viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer)
-
-When you open this folder in VS Code, you'll automatically see a prompt  
-to install these recommended extensions
+- Python 3.x, Flask
+- SQLite database
+- HTML, CSS, JavaScript served via Flask `templates` and `static` folders
 
 ---
 
@@ -41,40 +27,34 @@ to install these recommended extensions
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/planora-backend.git
-cd planora-backend
+git clone https://github.com/YOUR-USERNAME/planora.git
+cd planora
 ```
 
-### 2. Install dependencies
+### 2. (Optional) Create and activate a Python virtual environment
 
 ```bash
-pip install Flask
+python3 -m venv venv
+source venv/bin/activate
 ```
 
----
+### 3. Install dependencies
 
-### 3. Install SQLite CLI (Optional)
+```bash
+pip install -r requirements.txt
+```
 
-You can download the SQLite command-line tool from:
-[SQLite Downloads](https://www.sqlite.org/download.html)
+### 4. Install SQLite CLI (optional)
 
----
+Download from [SQLite Downloads](https://www.sqlite.org/download.html).
 
-### 4. Create the SQLite Database
-
-If you don’t have an existing database, you can create an empty one using:
+### 5. Create the SQLite database (if not exists)
 
 ```bash
 sqlite3 planora.db ""
 ```
 
-This will generate a new `planora.db` file in your project folder.
-
----
-
-### 5. Initialize the database schema
-
-Create a simple table manually using the SQLite CLI:
+### 6. Initialize the database schema
 
 ```bash
 sqlite3 planora.db
@@ -87,15 +67,13 @@ sqlite> CREATE TABLE IF NOT EXISTS events (
 sqlite> .exit
 ```
 
----
-
-### 6. Run the Flask Server
+### 7. Run the Flask application
 
 ```bash
 python app.py
 ```
 
-Your backend API will now be available at:
+The app will be available at:
 
 ```text
 http://localhost:5000
@@ -103,13 +81,11 @@ http://localhost:5000
 
 ---
 
-## 📌 Notes
+## 🧩 Recommended VS Code Extensions
 
-- This is a **school project**, not intended for production use.
-- For database inspection, you can use:
-  - SQLite CLI (`sqlite3 planora.db`)
-  - [SQLite Viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer) for VS Code
+- Python, Pylance, Black Formatter
+- Thunder Client (for API testing)
+- SQLite Viewer ([qwtel.sqlite-viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer))
+- Live Server (optional, for frontend prototyping)
 
----
-
-Would you like me to also add **instructions for testing POST requests** to add new events (e.g., using `curl`)?
+> Extensions and settings are preconfigured in `.vscode/extensions.json` and `.vscode/settings.json`.

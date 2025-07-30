@@ -1,7 +1,7 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 import sqlite3
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", static_url_path="")
 DATABASE = "planora.db"
 
 
@@ -12,8 +12,8 @@ def get_db_connection():
 
 
 @app.route("/")
-def hello_world():
-    return {"hello": "world"}
+def index():
+    return render_template("index.html")
 
 
 @app.route("/api/events")
