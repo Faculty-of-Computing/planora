@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "ms-python.black-formatter",
+        "esbenp.prettier-vscode",
+        "ms-python.vscode-pylance",
+        "ms-python.vscode-python-envs",
+        "qwtel.sqlite-viewer",
+        "rangav.vscode-thunder-client",
+        "ms-python.debugpy"
+    ]
+}
