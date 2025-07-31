@@ -2,7 +2,13 @@
 
 ![School Project](https://img.shields.io/badge/School%20Project-✔️-blue)
 
-🎓 **School project** – Event Management System built with **Flask (Python)** and **SQLite**, featuring a **frontend built with HTML, CSS, and JavaScript** served via Flask templates. Provides a backend API for managing events, users, and bookings with a simple, lightweight architecture.
+🎓 **School Project** – Event Management System built with **Flask (Python)** and **SQLite**, featuring a **frontend built with HTML, CSS, and JavaScript** served via Flask templates.  
+📖 **Course:** UUY-CSC222
+🏫 **Department:** Computer Science
+👥 **Group:** 9
+🎓 **Series:** 022/023
+
+Provides a backend API for managing events, users, and bookings with a simple, lightweight architecture.
 
 ---
 
