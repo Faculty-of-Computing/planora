@@ -1,14 +1,11 @@
+from db import create_tables
+from db.db import get_db_connection
 from flask import Flask, jsonify, render_template
-import sqlite3
+
+
+create_tables()
 
 app = Flask(__name__, static_folder="static", static_url_path="")
-DATABASE = "planora.db"
-
-
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
 
 
 @app.route("/")
@@ -19,7 +16,7 @@ def index():
 @app.route("/api/events")
 def events():
     conn = get_db_connection()
-    events = conn.execute("SELECT id, name, date FROM events").fetchall()
+    events = conn.execute("SELECT * FROM events").fetchall()
     conn.close()
     return jsonify([dict(event) for event in events])
 
