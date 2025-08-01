@@ -1,4 +1,10 @@
-from db.db import get_db_connection
+import sqlite3
+
+
+def get_db_connection():
+    conn = sqlite3.connect("planora.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 def create_tables():
@@ -80,7 +86,3 @@ def create_tables():
 
     conn.commit()
     conn.close()
-
-
-if __name__ == "__main__":
-    create_tables()
