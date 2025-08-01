@@ -7,7 +7,7 @@
   },
   "[html]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.html-language-features"
   },
   "[css]": {
     "editor.formatOnSave": true,
@@ -17,7 +17,11 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "yaml.schemas": {
-    "openapi:v3": "file:///home/winner/workspace/planora/openapi.yaml"
+  "markdownlint.config": {
+    "MD033": false
+  },
+  "workbench.editorAssociations": {
+    "*.svg": "imagePreview.previewEditor",
+    ".md": "vscode.markdown.preview.editor"
   }
 }

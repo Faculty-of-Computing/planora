@@ -7,6 +7,9 @@
     "qwtel.sqlite-viewer",
     "rangav.vscode-thunder-client",
     "ms-python.debugpy",
-    "arjun.swagger-viewer"
+    "arjun.swagger-viewer",
+    "eamodio.gitlens",
+    "bierner.github-markdown-preview",
+    "bierner.markdown-checkbox"
   ]
 }

@@ -9,7 +9,20 @@
   <rect x="745" y="15" width="50" height="30" fill="white" stroke="black"/>
   <text x="753" y="35" font-size="14" fill="black">Sign</text>
 
-  <!-- Featured Event Banner -->
+  <!-- Featured Event Banner -->from flask import render_template, Blueprint
+
+pages = Blueprint("pages", __name__)
+
+
+@pages.route("/")
+def index():
+    return render_template("index.html")
+
+
+@pages.route("/test")
+def test():
+    return render_template("test.html")
+
   <rect x="20" y="70" width="760" height="100" fill="white" stroke="black"/>
   <text x="40" y="110" font-size="20" fill="black">🎉 Featured: Big Summer Festival</text>
   <text x="40" y="130" font-size="14" fill="black">August 30 | City Center</text>
