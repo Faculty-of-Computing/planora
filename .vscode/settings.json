@@ -16,5 +16,8 @@
   "[javascript]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "yaml.schemas": {
+    "openapi:v3": "file:///home/winner/workspace/planora/openapi.yaml"
   }
 }

@@ -6,6 +6,7 @@
     "ms-python.vscode-python-envs",
     "qwtel.sqlite-viewer",
     "rangav.vscode-thunder-client",
-    "ms-python.debugpy"
+    "ms-python.debugpy",
+    "arjun.swagger-viewer"
   ]
 }
