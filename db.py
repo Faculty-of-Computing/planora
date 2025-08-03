@@ -8,6 +8,28 @@ def get_db_connection():
     return conn
 
 
+def reset_database():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA foreign_keys = OFF")
+    cursor.execute(
+        """
+        SELECT name 
+        FROM sqlite_master 
+        WHERE type='table' 
+        AND name NOT LIKE 'sqlite_%';
+    """
+    )
+    tables = cursor.fetchall()
+
+    for (table_name,) in tables:
+        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+
+    conn.commit()
+    conn.close()
+    print("Database reset: all tables and data deleted.")
+
+
 def create_tables():
     conn = get_db_connection()
     c = conn.cursor()
@@ -87,3 +109,30 @@ def create_tables():
 
     conn.commit()
     conn.close()
+
+def insert_user(email, username, password):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)", (email, username, password))
+    user_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return user_id
+
+def get_user_by_email(email):
+    conn =get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, username, password_hash FROM users WHERE email = ?", (email,))
+    user = cursor.fetchone()
+    conn.close()
+    return user
+
+def get_user_by_id(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, username, email FROM users WHERE id = ?", (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+    return user
