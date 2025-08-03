@@ -4,6 +4,7 @@ import sqlite3
 def get_db_connection():
     conn = sqlite3.connect("planora.db")
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 
@@ -15,7 +16,7 @@ def create_tables():
     c.execute(
         """
     CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE NOT NULL,
         username TEXT NOT NULL,
         password_hash TEXT NOT NULL
@@ -27,8 +28,8 @@ def create_tables():
     c.execute(
         """
     CREATE TABLE IF NOT EXISTS events (
-        id TEXT PRIMARY KEY,
-        creator_id TEXT NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        creator_id INTEGER NOT NULL,
         title TEXT NOT NULL,
         description TEXT NOT NULL,
         date TEXT NOT NULL, -- ISO date string
@@ -39,13 +40,13 @@ def create_tables():
     """
     )
 
-    # Registrations table (users registered for events)
+    # Registrations table
     c.execute(
         """
     CREATE TABLE IF NOT EXISTS registrations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT NOT NULL,
-        event_id TEXT NOT NULL,
+        user_id INTEGER NOT NULL,
+        event_id INTEGER NOT NULL,
         UNIQUE(user_id, event_id),
         FOREIGN KEY (user_id) REFERENCES users(id),
         FOREIGN KEY (event_id) REFERENCES events(id)
@@ -53,12 +54,12 @@ def create_tables():
     """
     )
 
-    # Ticket options per event (ticket tiers)
+    # Ticket options table
     c.execute(
         """
     CREATE TABLE IF NOT EXISTS ticket_options (
-        id TEXT PRIMARY KEY,
-        event_id TEXT NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
         name TEXT NOT NULL,
         price REAL NOT NULL,
         quantity_available INTEGER NOT NULL,
@@ -67,14 +68,14 @@ def create_tables():
     """
     )
 
-    # Tickets purchased by users
+    # Tickets table
     c.execute(
         """
     CREATE TABLE IF NOT EXISTS tickets (
-        id TEXT PRIMARY KEY,
-        event_id TEXT NOT NULL,
-        ticket_option_id TEXT NOT NULL,
-        owner_id TEXT NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        ticket_option_id INTEGER NOT NULL,
+        owner_id INTEGER NOT NULL,
         purchase_date TEXT NOT NULL, -- ISO datetime string
         qr_code_url TEXT,
         FOREIGN KEY (event_id) REFERENCES events(id),
