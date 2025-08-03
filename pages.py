@@ -17,6 +17,12 @@ def test():
 def home():
     return render_template("home.html")
 
+
+
+@pages.route("/events/create")
+def create():
+    return render_template("create.html")
+
 @pages.route('/profile')
 def profile():
     
