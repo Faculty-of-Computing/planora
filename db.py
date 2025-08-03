@@ -109,3 +109,30 @@ def create_tables():
 
     conn.commit()
     conn.close()
+
+def insert_user(email, username, password):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)", (email, username, password))
+    user_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return user_id
+
+def get_user_by_email(email):
+    conn =get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, username, password_hash FROM users WHERE email = ?", (email,))
+    user = cursor.fetchone()
+    conn.close()
+    return user
+
+def get_user_by_id(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, username, email FROM users WHERE id = ?", (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+    return user

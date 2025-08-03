@@ -36,8 +36,8 @@
 | `/register`                  | Registration page         | Form → POST `/api/auth/register` → Auto-login                    |      Uwakmfon      |     ⬜      |
 | `/events`                    | Browse events             | Fetch `/api/events` → Filters/search                             |        ---         |     ⬜      |
 | `/events/create`             | Create event              | Form → POST `/api/events`                                        |       Davies       |     ✅      |
-| `/events/:eventId`           | Event details (shareable) | GET `/api/events/:eventId` → Show info, register, buy tickets    |        ---         |     ⬜      |
+| `/events/:eventId`           | Event details (shareable) | GET `/api/events/:eventId` → Show info, register, buy tickets    |       Davies       |     ✅      |
 | `/events/:eventId/edit`      | Edit event                | Auth → Verify owner → PUT `/api/events/:eventId`                 |        ---         |     ⬜      |
-| `/events/:eventId/attendees` | Attendees list            | Auth → Verify owner → GET `/api/events/:eventId/attendees`       |     Daniel Aji     |     ⬜      |
+| `/events/:eventId/attendees` | Attendees list            | Auth → Verify owner → GET `/api/events/:eventId/attendees`       |     Daniel Aji     |     ✅      |
 | `/tickets/:ticketId`         | Ticket view               | GET `/api/tickets/:ticketId` → Show QR                           |        ---         |     ⬜      |
 | `/profile`                   | User profile              | GET `/api/auth/me` → Show created events, registrations, tickets |     Daniel Aji     |     ✅      |
