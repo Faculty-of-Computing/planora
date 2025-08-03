@@ -1,14 +1,8 @@
 from flask import Blueprint, request, jsonify
 import sqlite3
+from db import get_db_connection
 
 api = Blueprint("api", __name__, url_prefix="/api")
-
-
-def get_db_connection():
-    conn = sqlite3.connect("planora.db")
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
 
 
 @api.route("/")
@@ -19,11 +13,10 @@ def events():
 @api.route("/events/<int:event_id>/register", methods=["POST"])
 def register_for_event(event_id):
     """Register a user for an event."""
-    data = request.get_json()
-    if not data or "user_id" not in data:
-        return jsonify({"error": "Missing user_id"}), 400
 
-    user_id = data["user_id"]
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
 
     conn = get_db_connection()
     cursor = conn.cursor()
