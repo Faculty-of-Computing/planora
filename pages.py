@@ -11,3 +11,8 @@ def index():
 @pages.route("/test")
 def test():
     return render_template("test.html")
+
+
+@pages.route("/home")
+def home():
+    return render_template("home.html")
