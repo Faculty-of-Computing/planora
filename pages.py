@@ -21,3 +21,8 @@ def home():
 @pages.route("/create")
 def create():
     return render_template("create.html")
+
+
+@pages.route("/details")
+def details():
+    return render_template("details.html")
