@@ -144,7 +144,7 @@ nav {
 
 main {
   padding: 20px;
-  height: 100vh;
+  min-height: 100vh;
 }
 .featured-container {
   display: flex;
@@ -223,6 +223,54 @@ label.upload-field {
   padding: 10px 25px;
   margin: 0 10px;
 }
+/* Custom styling for details.html/event-details page */
+.hero {
+  gap: 2rem;
+  padding: 10px;
+  margin: 20px 0;
+  width: 100%;
+}
+/* Container for hero image */
+.hero-img-container {
+  width: 60%;
+  height: 300px;
+  background-color: gray;
+}
+.event-details {
+  height: 300px;
+  width: 40%;
+  padding: 20px;
+  gap: 0.8rem;
+  font-size: 1.2rem;
+}
+#event-description {
+  padding: 10px;
+  margin: 30px 0;
+}
+.event-description {
+  min-height: 100px;
+  padding: 10px 20px;
+  margin: 20px 0;
+  width: 80%;
+}
+#ticket-options .flex {
+  padding: 10px;
+  justify-content: space-evenly;
+  min-height: 200px;
+}
+#ticket-options .flex div {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+#ticket-options .flex div p {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+#ticket-options .flex div button {
+  padding: 10px 30px;
+  cursor: pointer;
+}
 @media (max-width: 576px) {
   .featured-container {
     flex-direction: column;
@@ -280,5 +328,16 @@ label.upload-field {
   }
   .search-field-container {
     flex-wrap: wrap;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+  .hero div {
+    width: 100%;
+  }
+  #ticket-options .flex div {
+    width: 100%;
+    padding: 10px;
+    margin: 30px;
   }
 }

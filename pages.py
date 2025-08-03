@@ -23,6 +23,11 @@ def home():
 def create():
     return render_template("create.html")
 
+
+@pages.route("/events/<int:event_id>/details")
+def details(event_id):
+    return render_template("details.html")
+
 @pages.route('/profile')
 def profile():
     
@@ -37,7 +42,7 @@ def profile():
     }
     return render_template('userprofile.html', user=user_data)
 
-@pages.route('/event/<int:event_id>/attendees')
+@pages.route('/events/<int:event_id>/attendees')
 def attendees(event_id):
     # Sample data - replace with actual database query
     sample_attendees = [
