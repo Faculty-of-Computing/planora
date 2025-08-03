@@ -17,11 +17,11 @@
 | `/api/events/:eventId`           |    GET     | Event details           | Fetch from DB → Include tickets, attendees count           |     Idaraobong     |     ⬜      |
 | `/api/events/:eventId`           |    PUT     | Update event            | Auth → Verify ownership → Update fields                    |     Idaraobong     |     ⬜      |
 | `/api/events/:eventId`           |   DELETE   | Delete event            | Auth → Verify ownership → Soft/hard delete                 |     Idaraobong     |     ⬜      |
-| `/api/events/:eventId/register`  |    POST    | Register user for event | Auth → Check already registered → Add record               |     Ekomobong      |     ⬜      |
-| `/api/events/:eventId/attendees` |    GET     | View attendees          | Auth → Verify owner → Fetch attendees                      |        ---         |     ⬜      |
-| `/api/events/:eventId/tickets`   |    GET     | Ticket options          | Fetch ticket tiers from DB                                 |        ---         |     ⬜      |
+| `/api/events/:eventId/register`  |    POST    | Register user for event | Auth → Check already registered → Add record               |     Ekomobong      |     ✅      |
+| `/api/events/:eventId/attendees` |    GET     | View attendees          | Auth → Verify owner → Fetch attendees                      |       Cravey       |     ⬜      |
+| `/api/events/:eventId/tickets`   |    GET     | Ticket options          | Fetch ticket tiers from DB                                 |       Cravey       |     ⬜      |
 | `/api/events/:eventId/tickets`   |    POST    | Buy ticket              | Auth → Payment → Save purchase                             |        ---         |     ⬜      |
-| `/api/tickets/:ticketId`         |    GET     | View ticket             | Auth → Verify owner → Return ticket/QR                     |        ---         |     ⬜      |
+| `/api/tickets/:ticketId`         |    GET     | View ticket             | Auth → Verify owner → Return ticket/QR                     |       Cravey       |     ⬜      |
 
 ---
 
@@ -31,7 +31,7 @@
 
 | **Route**                    | **Purpose**               | **Implementation Steps**                                         | **👤 Assigned To** | **✅ Done** |
 | ---------------------------- | ------------------------- | ---------------------------------------------------------------- | :----------------: | :---------: |
-| `/`                          | Homepage (events list)    | Fetch `/api/events` → Display cards with ticket availability     |       Davies       |     ⬜      |
+| `/`                          | Homepage (events list)    | Fetch `/api/events` → Display cards with ticket availability     |       Davies       |     ✅      |
 | `/login`                     | Login page                | Form → POST `/api/auth/login` → Store token → Redirect           |      Kenneth       |     ⬜      |
 | `/register`                  | Registration page         | Form → POST `/api/auth/register` → Auto-login                    |      Uwakmfon      |     ⬜      |
 | `/events`                    | Browse events             | Fetch `/api/events` → Filters/search                             |        ---         |     ⬜      |
