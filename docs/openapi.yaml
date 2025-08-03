@@ -295,7 +295,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
         email:
           type: string
           format: email
@@ -328,9 +328,9 @@ components:
         - type: object
           properties:
             id:
-              type: string
+              type: integer
             creatorId:
-              type: string
+              type: integer
 
     EventDetails:
       allOf:
@@ -346,7 +346,7 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
         name:
           type: string
         price:
@@ -362,7 +362,7 @@ components:
         - quantity
       properties:
         ticketOptionId:
-          type: string
+          type: integer
         quantity:
           type: integer
           minimum: 1
@@ -371,13 +371,13 @@ components:
       type: object
       properties:
         id:
-          type: string
+          type: integer
         eventId:
-          type: string
+          type: integer
         ticketOptionId:
-          type: string
+          type: integer
         ownerId:
-          type: string
+          type: integer
         purchaseDate:
           type: string
           format: date-time
