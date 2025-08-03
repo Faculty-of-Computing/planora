@@ -16,3 +16,17 @@ def test():
 @pages.route("/home")
 def home():
     return render_template("home.html")
+
+@pages.route('/profile')
+def profile():
+    # You can pass user data here
+    user_data = {
+        'name': 'John Doe',
+        'email': 'john@example.com',
+        'events': [
+            {'name': 'Music Concert', 'date': 'Aug 5'},
+            {'name': 'Tech Meetup', 'date': 'Aug 10'},
+            {'name': 'Tech Meetup', 'date': 'Aug 10'}
+        ]
+    }
+    return render_template('userprofile.html', user=user_data)
