@@ -16,3 +16,8 @@ def test():
 @pages.route("/home")
 def home():
     return render_template("home.html")
+
+
+@pages.route("/create")
+def create():
+    return render_template("create.html")

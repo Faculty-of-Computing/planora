@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}
+Planora — Event Management System
+{%endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}" />
+{% endblock %}
+
+{%block body%}  
+  <nav class="secondary">
+        <div class="logo">
+            <img src="{{url_for('static', filename='/images/planora.png')}}" alt="">
+        </div>
+        <div class="menu">
+            <div class="theme-toggler border">
+                <img src="{{url_for('static', filename='images/icons/moon-stars-svgrepo-com.svg')}}" alt="">
+            </div>
+            <div class="container">
+                <input type="text" class="border foreground" placeholder="Search">
+                <a href="#" class="btn primary primary-foreground border">Login</a>
+                <a href="#" class="btn secondary border foreground">Sign Up</a>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="create">
+            <div class="theme-toggler border">
+                <img src="{{url_for('static', filename='images/icons/moon-stars-svgrepo-com.svg')}}" alt="">
+            </div>
+            <!-- Hamburger icon -->
+            <div class="menu-icon">
+                <img src="{{url_for('static', filename='images/icons/menu-dark.svg')}}" alt="">
+            </div>
+            <div class="container background">
+                <!-- Close icon -->
+                <div class="close-icon">
+                    <img src="{{url_for('static', filename='images/icons/close-dark.svg')}}" alt="">
+                </div>
+                <a href="#" class="btn primary primary-foreground border">Login</a>
+                <a href="#" class="btn secondary border foreground">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+    <main class="background">
+        <h1 class="primary-foreground">Create New Event</h1>
+        <form>
+            <label for="event-title" class="primary-foreground">Event Title</label>
+            <input type="text" id="event-title" class="foreground border">
+            <label for="description" class="primary-foreground">Event Title</label>
+            <textarea name="" id="description" class="foreground border"></textarea>
+            <!-- Search Field  -->
+            <div class="search-field-container flex">
+                <div class="date-field flex column">
+                    <label for="date" class="primary-foreground">Date</label>
+                    <input id="date" class="border foreground" type="date" placeholder="Search by title">
+                </div>
+                <div class="location-field flex column">
+                    <label for="location" class="primary-foreground">Location</label>
+                    <input type="text" id="location" class="border foreground" placeholder="Location">
+                </div>
+                <div class="ticket-price-field flex column">
+                    <label for="ticket-price" class="primary-foreground">Ticket Price</label>
+                    <input type="text" class="border foreground">
+                </div>
+            </div>
+            <label class="primary-foreground">Upload Banner Image</label>
+            <input type="file" name="" id="upload" class="foreground border" hidden>
+            <label for="upload" class="btn secondary upload-field primary-foreground border">Choose Image</label>
+            <div class="ticket-options-container">
+                <label for="ticket-opt" class="primary-foreground">Ticket Options</label>
+                <div class="ticket-options">
+                    <select name="" id="" class="foreground border primary-foreground">
+                        <option value="1">Regular - $35</option>
+                        <option value="2">VIP - $50</option>
+                        <option value="3">VVIP - $70</option>
+                    </select>
+                    <button class="add primary primary-foreground border">Add</button>
+                </div>
+            </div>
+    </main>
+    <footer class="secondary">
+        <p class="foreground">&copy;2025 Planora-All Rights Reserved</p>
+    </footer>
+ <script>
+  const urls = {
+    sun: "{{ url_for('static', filename='images/icons/sun-svgrepo-com.svg') }}",
+    moon: "{{ url_for('static', filename='images/icons/moon-stars-svgrepo-com.svg') }}",
+    closeDark: "{{ url_for('static', filename='images/icons/close-dark.svg') }}",
+    closeLight: "{{ url_for('static', filename='images/icons/close-light.svg') }}",
+    menuDark: "{{ url_for('static', filename='images/icons/menu-dark.svg') }}",
+    menuLight: "{{ url_for('static', filename='images/icons/menu-light.svg') }}"
+  };
+</script>
+    <script src="{{url_for('static', filename ='/js/index.js')}}"></script>{%endblock%}
