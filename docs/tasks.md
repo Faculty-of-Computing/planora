@@ -8,15 +8,15 @@
 
 | **Route**                        | **Method** | **Purpose**             | **Implementation Steps**                                   | **👤 Assigned To** | **✅ Done** |
 | -------------------------------- | :--------: | ----------------------- | ---------------------------------------------------------- | :----------------: | :---------: |
-| `/api/auth/register`             |    POST    | Create new user         | Validate → Store password → Save → Store user id as cookie |      Emediong      |     ⬜      |
-| `/api/auth/login`                |    POST    | Authenticate user       | Validate → Compare password → Store user id as cookie      |      Emediong      |     ⬜      |
-| `/api/auth/logout`               |    POST    | Logout user             | Remove user id cookie                                      |      Emediong      |     ⬜      |
-| `/api/auth/me`                   |    GET     | Get current user        | Auth → Fetch user                                          |      Emediong      |     ⬜      |
-| `/api/events`                    |    GET     | List all events         | Query DB → Filters → Return list                           |     Idaraobong     |     ⬜      |
-| `/api/events`                    |    POST    | Create new event        | Auth → Validate → Save event with `creatorId`              |     Idaraobong     |     ⬜      |
-| `/api/events/:eventId`           |    GET     | Event details           | Fetch from DB → Include tickets, attendees count           |     Idaraobong     |     ⬜      |
-| `/api/events/:eventId`           |    PUT     | Update event            | Auth → Verify ownership → Update fields                    |     Idaraobong     |     ⬜      |
-| `/api/events/:eventId`           |   DELETE   | Delete event            | Auth → Verify ownership → Soft/hard delete                 |     Idaraobong     |     ⬜      |
+| `/api/auth/register`             |    POST    | Create new user         | Validate → Store password → Save → Store user id as cookie |      Emediong      |     ✅      |
+| `/api/auth/login`                |    POST    | Authenticate user       | Validate → Compare password → Store user id as cookie      |      Emediong      |     ✅      |
+| `/api/auth/logout`               |    POST    | Logout user             | Remove user id cookie                                      |      Emediong      |     ✅      |
+| `/api/auth/me`                   |    GET     | Get current user        | Auth → Fetch user                                          |      Emediong      |     ✅      |
+| `/api/events`                    |    GET     | List all events         | Query DB → Filters → Return list                           |     Idaraobong     |     ✅      |
+| `/api/events`                    |    POST    | Create new event        | Auth → Validate → Save event with `creatorId`              |     Idaraobong     |     ✅      |
+| `/api/events/:eventId`           |    GET     | Event details           | Fetch from DB → Include tickets, attendees count           |     Idaraobong     |     ✅      |
+| `/api/events/:eventId`           |    PUT     | Update event            | Auth → Verify ownership → Update fields                    |     Idaraobong     |     ✅      |
+| `/api/events/:eventId`           |   DELETE   | Delete event            | Auth → Verify ownership → Soft/hard delete                 |     Idaraobong     |     ✅      |
 | `/api/events/:eventId/register`  |    POST    | Register user for event | Auth → Check already registered → Add record               |     Ekomobong      |     ✅      |
 | `/api/events/:eventId/attendees` |    GET     | View attendees          | Auth → Verify owner → Fetch attendees                      |       Cravey       |     ⬜      |
 | `/api/events/:eventId/tickets`   |    GET     | Ticket options          | Fetch ticket tiers from DB                                 |       Cravey       |     ⬜      |
