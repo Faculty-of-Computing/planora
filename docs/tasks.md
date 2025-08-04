@@ -32,7 +32,7 @@
 | **Route**                    | **Purpose**               | **Implementation Steps**                                         | **👤 Assigned To** | **✅ Done** |
 | ---------------------------- | ------------------------- | ---------------------------------------------------------------- | :----------------: | :---------: |
 | `/`                          | Homepage (events list)    | Fetch `/api/events` → Display cards with ticket availability     |       Davies       |     ✅      |
-| `/login`                     | Login page                | Form → POST `/api/auth/login` → Store token → Redirect           |      Kenneth       |     ⬜      |
+| `/login`                     | Login page                | Form → POST `/api/auth/login` → Store token → Redirect           |      Kenneth       |     ✅      |
 | `/register`                  | Registration page         | Form → POST `/api/auth/register` → Auto-login                    |      Uwakmfon      |     ⬜      |
 | `/events`                    | Browse events             | Fetch `/api/events` → Filters/search                             |        ---         |     ⬜      |
 | `/events/create`             | Create event              | Form → POST `/api/events`                                        |       Davies       |     ✅      |
