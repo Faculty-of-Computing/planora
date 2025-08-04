@@ -199,11 +199,11 @@ def register():
 
 @api.route("/auth/login", methods=["POST"])
 def login():
-    data = request.get_json()
-    email = data.get("email", "").strip().lower()
-    password = data.get("password")
+    email = request.form["email"].strip().lower()
+    password = request.form["password"]
 
     if email is None or password is None:
+        # TODO return user to login page indicating error
         return jsonify({"error": "Email and Password are required!"}), 400
 
     print(f"Looking for email: {email}")
