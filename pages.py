@@ -84,3 +84,8 @@ def attendees(event_id):
 @pages.route("/login")
 def login():
     return render_template("login-page.html")
+
+
+@pages.route("/ticket/<int:ticket_id>")
+def ticket():
+    return render_template("ticket.html")

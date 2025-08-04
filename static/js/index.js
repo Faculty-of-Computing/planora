@@ -20,14 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Open mobile Menu
-  menuIcon.addEventListener("click", () => {
-    mobileMenu.style.display = "flex";
-  });
-  // Close mobile menu
-  closeIcon.addEventListener("click", () => {
-    mobileMenu.style.display = "none";
-  });
+  if (menuIcon && mobileMenu) {
+    menuIcon.addEventListener("click", () => {
+      mobileMenu.style.display = "flex";
+    });
+
+    closeIcon.addEventListener("click", () => {
+      mobileMenu.style.display = "none";
+    });
+  }
   // Initial setup
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   document.documentElement.classList.toggle("dark", prefersDark);
