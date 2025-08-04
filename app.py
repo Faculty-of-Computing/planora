@@ -1,5 +1,4 @@
 from db import create_tables
-from init import app
 from pages import pages
 from api import api
 from flask import Flask
