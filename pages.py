@@ -86,6 +86,6 @@ def login():
     return render_template("login-page.html")
 
 
-@pages.route("/ticket")
+@pages.route("/ticket/<int:ticket_id>")
 def ticket():
     return render_template("ticket.html")
