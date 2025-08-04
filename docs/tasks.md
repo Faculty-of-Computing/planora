@@ -33,7 +33,7 @@
 | ---------------------------- | ------------------------- | ---------------------------------------------------------------- | :----------------: | :---------: |
 | `/`                          | Homepage (events list)    | Fetch `/api/events` → Display cards with ticket availability     |       Davies       |     ✅      |
 | `/login`                     | Login page                | Form → POST `/api/auth/login` → Store token → Redirect           |      Kenneth       |     ✅      |
-| `/register`                  | Registration page         | Form → POST `/api/auth/register` → Auto-login                    |       Karan        |     ⬜      |
+| `/register`                  | Registration page         | Form → POST `/api/auth/register` → Auto-login                    |       -----        |     ⬜      |
 | `/events`                    | Browse events             | Fetch `/api/events` → Filters/search                             |       Fidel        |     ⬜      |
 | `/events/create`             | Create event              | Form → POST `/api/events`                                        |       Davies       |     ✅      |
 | `/events/:eventId`           | Event details (shareable) | GET `/api/events/:eventId` → Show info, register, buy tickets    |       Davies       |     ✅      |
