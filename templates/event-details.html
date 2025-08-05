@@ -55,7 +55,12 @@ Planora — Event: {{ event.title }}
         transition: background-color 0.3s ease;
     }
 
-    .ticket-purchase button:hover {
+    .ticket-purchase button:disabled {
+        background-color: #aaa;
+        cursor: not-allowed;
+    }
+
+    .ticket-purchase button:hover:not(:disabled) {
         background-color: #357ABD;
     }
 
@@ -114,6 +119,7 @@ Planora — Event: {{ event.title }}
             <p class="foreground">🗓️ Date: {{ event.date }}</p>
             <p class="foreground">📍 Location: {{ event.location or "TBA" }}</p>
             <p class="foreground">👥 Attendees: {{ event.attendees or 0 }}</p>
+            <p class="foreground">🎟️ Tickets Available: {{ event.tickets_available or 0 }}</p>
         </div>
     </section>
 
@@ -124,8 +130,10 @@ Planora — Event: {{ event.title }}
 
     <section id="ticket-price" class="ticket-purchase secondary">
         <p class="foreground">💵 Price: ${{ "%.2f"|format(event.price) }}</p>
+
         <form method="POST">
-            <button type="submit" class="btn primary primary-foreground border">
+            <button type="submit" class="btn primary primary-foreground border" {% if not user_registered and
+                (event.tickets_available | int) <=0 %}disabled{% endif %}>
                 {% if user_registered %}
                 Cancel Registration
                 {% else %}
@@ -133,6 +141,7 @@ Planora — Event: {{ event.title }}
                 {% endif %}
             </button>
         </form>
+
         <button type="button" id="share-event-btn" class="btn primary primary-foreground border"
             title="Share this event">
             Share Event
@@ -161,7 +170,6 @@ Planora — Event: {{ event.title }}
                 alert('Sharing was cancelled or failed.');
             }
         } else {
-            // Fallback: copy URL to clipboard or just alert
             try {
                 await navigator.clipboard.writeText(window.location.href);
                 alert('Event URL copied to clipboard!');

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - Planora</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <link rel="stylesheet" href="/css/profile.css">
 </head>
 <body>
     <!-- Navbar -->
@@ -12,11 +12,11 @@
         <div class="nav-brand">Planora</div>
         <div class="nav-controls">
             <button class="theme-toggler border">
-                <img src="{{ url_for('static', filename='images/icons/sun-svgrepo-com.svg') }}" alt="theme toggle">
+                <img src="/images/icons/sun-svgrepo-com.svg" alt="theme toggle">
             </button>
             <button class="logout-btn btn">Logout</button>
             <div class="menu-icon">
-                <img src="{{ url_for('static', filename='images/icons/menu-dark.svg') }}" alt="menu">
+                <img src="/images/icons/menu-dark.svg" alt="menu">
             </div>
         </div>
     </nav>
@@ -25,7 +25,7 @@
     <div class="mobile-menu">
         <div class="container background">
             <div class="close-icon">
-                <img src="{{ url_for('static', filename='images/icons/close-dark.svg') }}" alt="close">
+                <img src="/images/icons/close-dark.svg" alt="close">
             </div>
             <button class="logout-btn btn">Logout</button>
         </div>
@@ -69,14 +69,14 @@
     <!-- Scripts -->
     <script>
         const urls = {
-            sun: "{{ url_for('static', filename='images/icons/sun-svgrepo-com.svg') }}",
-            moon: "{{ url_for('static', filename='images/icons/moon-stars-svgrepo-com.svg') }}",
-            closeDark: "{{ url_for('static', filename='images/icons/close-dark.svg') }}",
-            closeLight: "{{ url_for('static', filename='images/icons/close-light.svg') }}",
-            menuDark: "{{ url_for('static', filename='images/icons/menu-dark.svg') }}",
-            menuLight: "{{ url_for('static', filename='images/icons/menu-light.svg') }}"
+            sun: "/images/icons/sun-svgrepo-com.svg",
+            moon: "/images/icons/moon-stars-svgrepo-com.svg",
+            closeDark: "/images/icons/close-dark.svg",
+            closeLight: "/images/icons/close-light.svg",
+            menuDark: "/images/icons/menu-dark.svg",
+            menuLight: "/images/icons/menu-light.svg"
         };
     </script>
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script src="/js/index.js"></script>
 </body>
 </html>

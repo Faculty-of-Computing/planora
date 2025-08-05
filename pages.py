@@ -68,9 +68,17 @@ def create_event():
         date = request.form.get("date", "").strip()
         location = request.form.get("location", "").strip()
         price = request.form.get("price", "").strip()
+        tickets_available = request.form.get("tickets_available", "").strip()
         image_file = request.files.get("image")
 
-        if not (title and description and date and price and image_file):
+        if not (
+            title
+            and description
+            and date
+            and price
+            and tickets_available
+            and image_file
+        ):
             return render_template(
                 "create-event.html", error="Please fill in all required fields."
             )
@@ -78,13 +86,20 @@ def create_event():
         try:
             creator_id = int(user_id)
             price_val = float(price)
+            tickets_available_val = int(tickets_available)
             if price_val < 0:
                 return render_template(
                     "create-event.html", error="Price must be zero or positive."
                 )
+            if tickets_available_val < 0:
+                return render_template(
+                    "create-event.html",
+                    error="Tickets available must be zero or positive.",
+                )
         except ValueError:
             return render_template(
-                "create-event.html", error="Invalid user ID or price."
+                "create-event.html",
+                error="Invalid user ID, price, or tickets available.",
             )
 
         event_id = db.insert_event(
@@ -94,6 +109,7 @@ def create_event():
             date=date,
             location=location,
             price=price_val,
+            tickets_available=tickets_available_val,
             image_file=image_file,
         )
 
@@ -134,7 +150,6 @@ def event_details(event_id: int):
 
 @pages.route("/profile")
 def profile():
-
     user_data = {
         "name": "John Doe",
         "email": "john@example.com",

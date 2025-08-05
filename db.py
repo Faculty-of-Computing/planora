@@ -1,5 +1,6 @@
 import sqlite3
 from werkzeug.datastructures import FileStorage
+from typing import List
 
 
 def get_db_connection():
@@ -47,7 +48,7 @@ def create_tables():
         """
     )
 
-    # Events table with BLOB image and MIME type
+    # Events table with tickets_available column added
     c.execute(
         """
         CREATE TABLE IF NOT EXISTS events (
@@ -58,6 +59,7 @@ def create_tables():
             date TEXT NOT NULL, -- ISO date string
             location TEXT,
             price REAL,
+            tickets_available INTEGER NOT NULL DEFAULT 0, -- new column for tickets
             image BLOB, -- Store binary image data
             image_mime TEXT, -- Store MIME type (e.g., image/png)
             FOREIGN KEY (creator_id) REFERENCES users(id)
@@ -127,6 +129,7 @@ def insert_event(
     date: str,
     location: str,
     price: float,
+    tickets_available: int,
     image_file: FileStorage,
 ):
     """
@@ -140,8 +143,8 @@ def insert_event(
 
     cursor.execute(
         """
-        INSERT INTO events (creator_id, title, description, date, location, price, image, image_mime)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO events (creator_id, title, description, date, location, price, tickets_available, image, image_mime)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             creator_id,
@@ -150,6 +153,7 @@ def insert_event(
             date,
             location,
             price,
+            tickets_available,
             image_bytes,
             image_mime,
         ),
@@ -164,7 +168,11 @@ def get_event_by_id(event_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT id, title, description, date, location, price FROM events WHERE id = ?",
+        """
+        SELECT id, title, description, date, location, price, tickets_available
+        FROM events 
+        WHERE id = ?
+        """,
         (event_id,),
     )
     row = cursor.fetchone()
@@ -178,8 +186,7 @@ def count_event_registrations(event_id: int) -> int:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT COUNT(*) AS count FROM registrations WHERE event_id = ?",
-        (event_id,),
+        "SELECT COUNT(*) AS count FROM registrations WHERE event_id = ?", (event_id,)
     )
     count = cursor.fetchone()["count"]
     conn.close()
@@ -210,18 +217,45 @@ def is_user_registered_for_event(user_id: int, event_id: int) -> bool:
     return exists
 
 
-def register_user_for_event(user_id: int, event_id: int):
+def register_user_for_event(user_id: int, event_id: int) -> bool:
+    """
+    Attempt to register user for event.
+    Return True if registered, False if no tickets available or already registered.
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Check if user already registered
+    cursor.execute(
+        "SELECT 1 FROM registrations WHERE user_id = ? AND event_id = ?",
+        (user_id, event_id),
+    )
+    if cursor.fetchone():
+        conn.close()
+        return False  # Already registered
+
+    # Check tickets availability
+    cursor.execute("SELECT tickets_available FROM events WHERE id = ?", (event_id,))
+    row = cursor.fetchone()
+    if not row or row["tickets_available"] <= 0:
+        conn.close()
+        return False  # No tickets available
+
+    # Proceed to register user
     try:
         cursor.execute(
             "INSERT INTO registrations (user_id, event_id) VALUES (?, ?)",
             (user_id, event_id),
         )
+        # Decrement tickets_available by 1
+        cursor.execute(
+            "UPDATE events SET tickets_available = tickets_available - 1 WHERE id = ?",
+            (event_id,),
+        )
         conn.commit()
+        return True
     except sqlite3.IntegrityError:
-        # User already registered
-        pass
+        return False
     finally:
         conn.close()
 
@@ -229,21 +263,28 @@ def register_user_for_event(user_id: int, event_id: int):
 def unregister_user_from_event(user_id: int, event_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Delete registration
     cursor.execute(
         "DELETE FROM registrations WHERE user_id = ? AND event_id = ?",
         (user_id, event_id),
     )
+    if cursor.rowcount > 0:
+        # Increase tickets_available by 1 only if a registration was deleted
+        cursor.execute(
+            "UPDATE events SET tickets_available = tickets_available + 1 WHERE id = ?",
+            (event_id,),
+        )
     conn.commit()
     conn.close()
 
-from typing import List
 
 def get_upcoming_events() -> List[sqlite3.Row]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT id, title, description, date, location, price
+        SELECT id, title, description, date, location, price, tickets_available
         FROM events
         WHERE date >= date('now')
         ORDER BY date ASC
