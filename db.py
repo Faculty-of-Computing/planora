@@ -235,3 +235,20 @@ def unregister_user_from_event(user_id: int, event_id: int):
     )
     conn.commit()
     conn.close()
+
+from typing import List
+
+def get_upcoming_events() -> List[sqlite3.Row]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT id, title, description, date, location, price
+        FROM events
+        WHERE date >= date('now')
+        ORDER BY date ASC
+        """
+    )
+    events = cursor.fetchall()
+    conn.close()
+    return events

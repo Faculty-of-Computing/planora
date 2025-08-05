@@ -23,8 +23,23 @@ def require_login():
 
 
 @pages.route("/home")
-def home():
-    return render_template("home.html")
+def upcoming_events():
+    events = db.get_upcoming_events()
+
+    # Add image_url and attendees count for each event
+    event_list = []
+    for event in events:
+        event_dict = dict(event)
+        event_id = event_dict["id"]
+        event_dict["image_url"] = (
+            url_for("pages.event_image", event_id=event_id)
+            if db.event_has_image(event_id)
+            else "/images/planora.png"
+        )
+        event_dict["attendees"] = db.count_event_registrations(event_id)
+        event_list.append(event_dict)  # type: ignore
+
+    return render_template("home.html", events=event_list)
 
 
 @pages.route("/events/<int:event_id>/image")

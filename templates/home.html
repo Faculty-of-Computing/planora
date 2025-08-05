@@ -2,161 +2,111 @@
 
 {% block title %}
 Planora — Event Management System
-{%endblock %}
+{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="/css/home.css" />
+<style>
+    .showcase-img-container {
+        width: 100%;
+        max-width: 200px;
+        /* limit max width */
+        height: 140px;
+        /* fixed height to control aspect ratio */
+        border-radius: 6px;
+        margin-bottom: 0.8rem;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+    }
+
+    /* Responsive adjustment */
+    @media (max-width: 768px) {
+        .showcase-img-container {
+            max-width: 100%;
+            height: 180px;
+        }
+    }
+</style>
 {% endblock %}
 
-{%block body%}
-
+{% block body %}
 <nav class="secondary">
     <!-- Product Logo -->
     <div class="logo">
-        <img src="/images/planora.png" alt="">
+        <img src="/images/planora.png" alt="Planora Logo">
     </div>
     <!-- Desktop Menu -->
     <div class="menu">
         <div class="theme-toggler border">
-            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="">
+            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="Toggle Theme">
         </div>
         <div class="container">
-            <input type="text" class="border foreground" placeholder="Search">
             <a href="/events/create" class="btn primary primary-foreground border">Create Event</a>
-            <!-- <a href="#" class="btn secondary border foreground">Sign Up</a> -->
         </div>
     </div>
     <!-- Mobile Menu -->
     <div class="mobile-menu">
         <div class="theme-toggler border">
-            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="">
+            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="Toggle Theme">
         </div>
         <!-- Hamburger icon -->
         <div class="menu-icon">
-            <img src="/images/icons/menu-dark.svg" alt="">
+            <img src="/images/icons/menu-dark.svg" alt="Menu">
         </div>
         <div class="container background">
             <!-- Close icon -->
             <div class="close-icon">
-                <img src="/images/icons/close-dark.svg" alt="">
+                <img src="/images/icons/close-dark.svg" alt="Close">
             </div>
-            <input type="text" class="border foreground" placeholder="Search">
             <a href="/events/create" class="btn primary primary-foreground border">Create Event</a>
-            <!-- <a href="#" class="btn secondary border foreground">Sign Up</a> -->
         </div>
     </div>
 </nav>
+
 <main class="background">
+    <!-- Featured Event -->
+    {% if events %}
     <div class="featured-container secondary">
         <div>
-            <h3 class="foreground">🎉 Featured: Big Summer Festival</h3>
-            <p class="foreground">August 30 | City Center</p>
+            <h3 class="foreground" style="margin-bottom: 15px;">🎉 Featured: {{ events[0].title }}</h3>
+            <p class="foreground">{{ events[0].date }} | {{ events[0].location or "TBA" }}</p>
         </div>
         <div>
-            <a href="" class="btn primary primary-foreground border">Learn More</a>
+            <a href="/events/{{ events[0].id }}" class="btn primary primary-foreground border">Learn More</a>
         </div>
     </div>
-    <!-- Search Field  -->
-    <div class="search-field-container">
-        <input class="border foreground" type="text" placeholder="Search by title">
-        <input type="text" class="border foreground" placeholder="Location">
-        <input type="date" class="border foreground">
-        <input type="text" class="border foreground" placeholder="Search">
-    </div>
+    {% endif %}
+
+    <!-- Upcoming Events List -->
+    {% if events|length > 1 %}
     <section class="event-showcase-section foreground">
         <h1>Upcoming Events</h1>
-        <!-- Event showcase -->
         <div class="event-showcase-container">
-            <!-- Box 1 -->
+            {% for event in events[0:] %}
             <div class="showcase-container secondary border">
-                <div class="showcase-img-container">
-                    <img src="" alt="music concert">
-                </div>
+                <div class="showcase-img-container" style="background-image: url('{{ event.image_url }}')"
+                    aria-label="{{ event.title }} Banner Image" role="img"></div>
                 <div class="showcase-description-container">
                     <div>
-                        <p class="showcase-title">Music Concert
-                        </p>
-                        <p class="showcase-details">Aug 5 | Music Hall</p>
+                        <p class="showcase-title">{{ event.title }}</p>
+                        <p class="showcase-details">{{ event.date }} | {{ event.location or "TBA" }}</p>
                     </div>
-                    <a class="btn primary primary-foreground">Register</a>
+                    <a href="/events/{{ event.id }}" class="btn primary primary-foreground">View</a>
                 </div>
             </div>
-            <!-- Box 2 -->
-            <div class="showcase-container secondary border">
-                <div class="showcase-img-container">
-                    <img src="" alt="tech mockup">
-                </div>
-                <div class="showcase-description-container">
-                    <div>
-                        <p class="showcase-title">Tech Mockup
-                        </p>
-                        <p class="showcase-details">Aug 10 | City Park</p>
-                    </div>
-                    <a class="btn primary primary-foreground">Register</a>
-                </div>
-            </div>
-            <!-- Box 3 -->
-            <div class="showcase-container secondary border">
-                <div class="showcase-img-container">
-                    <img src="" alt="Art Festival">
-                </div>
-                <div class="showcase-description-container">
-                    <div>
-                        <p class="showcase-title">Art Festival
-                        </p>
-                        <p class="showcase-details">Aug 15 | Auditorium </p>
-                    </div>
-                    <a class="btn primary primary-foreground">Register</a>
-                </div>
-            </div>
-            <!-- Box 4 -->
-            <div class="showcase-container secondary border">
-                <div class="showcase-img-container">
-                    <img src="" alt="Book Fair">
-                </div>
-                <div class="showcase-description-container">
-                    <div>
-                        <p class="showcase-title">Book Fair
-                        </p>
-                        <p class="showcase-details">Aug 18 | Library</p>
-                    </div>
-                    <a class="btn primary primary-foreground">Register</a>
-                </div>
-            </div>
-            <!-- Box 5 -->
-            <div class="showcase-container secondary border">
-                <div class="showcase-img-container">
-                    <img src="" alt="Startup Pitch">
-                </div>
-                <div class="showcase-description-container">
-                    <div>
-                        <p class="showcase-title">Startup Pitch
-                        </p>
-                        <p class="showcase-details">Aug 20 | Co-working</p>
-                    </div>
-                    <a class="btn primary primary-foreground">Register</a>
-                </div>
-            </div>
-            <!-- Box 6 -->
-            <div class="showcase-container secondary border">
-                <div class="showcase-img-container">
-                    <img src="" alt="Charity gala">
-                </div>
-                <div class="showcase-description-container">
-                    <div>
-                        <p class="showcase-title ">Charity Gala
-                        </p>
-                        <p class="showcase-details">Aug 25 | Hotel</p>
-                    </div>
-                    <a class="btn primary primary-foreground">Register</a>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </section>
+    {% endif %}
 </main>
+
 <footer class="secondary">
     <p class="foreground">&copy;2025 Planora-All Rights Reserved</p>
 </footer>
+
 <script>
     const urls = {
         sun: "/images/icons/sun-svgrepo-com.svg",
@@ -168,4 +118,4 @@ Planora — Event Management System
     };
 </script>
 <script src="/js/index.js"></script>
-{%endblock%}
+{% endblock %}
