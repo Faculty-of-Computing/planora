@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint
+from flask import render_template, Blueprint, request, redirect, url_for
 
 pages = Blueprint("pages", __name__)
 
@@ -89,3 +89,22 @@ def login():
 @pages.route("/ticket/<int:ticket_id>")
 def ticket():
     return render_template("ticket.html")
+
+@pages.route("/event/<int:event_id>/edit", methods=["GET", "POST"])
+def edit_event(event_id):
+    # Sample event data - replace with database query
+    event = {
+        "id": event_id,
+        "name": "Music Concert",
+        "date": "2025-08-05",
+        "location": "Main Hall",
+        "description": "This music concert brings together...",
+        "image_url": "path/to/image.jpg"
+    }
+
+    if request.method == "POST":
+        # Handle form submission
+        # Update event in database
+        return redirect(url_for("pages.details", event_id=event_id))
+
+    return render_template("edit-event.html", event=event)
