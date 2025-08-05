@@ -89,3 +89,7 @@ def login():
 @pages.route("/ticket/<int:ticket_id>")
 def ticket():
     return render_template("ticket.html")
+
+@pages.route("/register")
+def register():
+    return render_template("sign-up.html")

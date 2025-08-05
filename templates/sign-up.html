@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Event Management Sign Up</title>
   <style>
     * {
@@ -46,7 +47,8 @@
       color: #333;
     }
 
-    .form-group input, .form-group select {
+    .form-group input,
+    .form-group select {
       width: 100%;
       padding: 10px;
       border: 1px solid #ccc;
@@ -87,25 +89,14 @@
     }
   </style>
 </head>
+
 <body>
   <div class="signup-container">
     <h2>Create an Account</h2>
-    <form action="/register" method="POST">
-      <div class="form-group">
-        <label for="fullname">Full Name</label>
-        <input type="text" id="fullname" name="fullname" required />
-      </div>
+    <form action="/api/auth/register" method="POST">
       <div class="form-group">
         <label for="email">Email Address</label>
         <input type="email" id="email" name="email" required />
-      </div>
-      <div class="form-group">
-        <label for="role">Role</label>
-        <select id="role" name="role" required>
-          <option value="">-- Select Role --</option>
-          <option value="attendee">Attendee</option>
-          <option value="organizer">Organizer</option>
-        </select>
       </div>
       <div class="form-group">
         <label for="username">Choose Username</label>
@@ -126,4 +117,5 @@
     </div>
   </div>
 </body>
+
 </html>
