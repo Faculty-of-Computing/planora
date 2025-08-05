@@ -1,16 +1,16 @@
+# NOTE THESE PAGES REQUIRE THAT THE USER MUST BE AUTHENTICATED
+
 from flask import render_template, Blueprint, request, redirect, url_for
 
 pages = Blueprint("pages", __name__)
 
 
-@pages.route("/")
-def index():
-    return render_template("index.html")
-
-
-@pages.route("/test")
-def test():
-    return render_template("test.html")
+# NOTE MIDDLEWARE TO REQUIRE AUTH
+@pages.before_request
+def require_login():
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return redirect("/login")
 
 
 @pages.route("/home")
@@ -24,7 +24,7 @@ def create():
 
 
 @pages.route("/events/<int:event_id>/details")
-def details(event_id):
+def details(event_id: int):
     return render_template("details.html")
 
 
@@ -44,7 +44,7 @@ def profile():
 
 
 @pages.route("/events/<int:event_id>/attendees")
-def attendees(event_id):
+def attendees(event_id: int):
     # Sample data - replace with actual database query
     sample_attendees = [
         {
@@ -81,18 +81,13 @@ def attendees(event_id):
     return render_template("attendees.html", attendees=sample_attendees, event=event)
 
 
-@pages.route("/login")
-def login():
-    return render_template("login-page.html")
-
-
 @pages.route("/ticket/<int:ticket_id>")
 def ticket():
     return render_template("ticket.html")
 
 
 @pages.route("/event/<int:event_id>/edit", methods=["GET", "POST"])
-def edit_event(event_id):
+def edit_event(event_id: int):
     # Sample event data - replace with database query
     event = {
         "id": event_id,
@@ -100,7 +95,7 @@ def edit_event(event_id):
         "date": "2025-08-05",
         "location": "Main Hall",
         "description": "This music concert brings together...",
-        "image_url": "path/to/image.jpg"
+        "image_url": "path/to/image.jpg",
     }
 
     if request.method == "POST":
@@ -109,7 +104,3 @@ def edit_event(event_id):
         return redirect(url_for("pages.details", event_id=event_id))
 
     return render_template("edit-event.html", event=event)
-
-@pages.route("/register")
-def register():
-    return render_template("sign-up.html")

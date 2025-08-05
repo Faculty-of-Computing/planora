@@ -1,0 +1,33 @@
+{% extends "auth.html" %}
+
+{% block title %}
+Sign in to Planora
+{% endblock %}
+
+{%block body %}
+<div class="container">
+  <h2>Sign In</h2>
+
+  <!-- Display single error message -->
+  {% if error %}
+  <div class="error-message">
+    <p>{{ error }}</p>
+  </div>
+  {% endif %}
+
+  <form method="POST">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+    <button type="submit" class="login-button">Login</button>
+  </form>
+  <div class="footer">
+    <p>Don't have an account? <a href="/register">Sign Up</a></p>
+  </div>
+</div>
+{% endblock %}

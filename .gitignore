@@ -3,3 +3,4 @@ templates/layout.html
 templates/test.html
 .venv
 venv
+prisma

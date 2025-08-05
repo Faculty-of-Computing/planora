@@ -1,6 +1,4 @@
 # TODO
 
-- [ ] Footer
-- [ ] Navbar
-  - [ ] Signed In
-  - [ ] Signed Out
+- [ ] Replace all relative links with absolute links
+- [ ] Shared layouts

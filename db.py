@@ -110,26 +110,36 @@ def create_tables():
     conn.commit()
     conn.close()
 
-def insert_user(email, username, password):
+
+def insert_user(email: str, username: str, password: str):
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    cursor.execute("INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)", (email, username, password))
-    user_id = cursor.lastrowid
-    conn.commit()
-    conn.close()
+    try:
+        cursor.execute(
+            "INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)",
+            (email, username, password),
+        )
+        user_id = cursor.lastrowid
+        conn.commit()
+    except sqlite3.IntegrityError as e:
+        raise ValueError("Email or username already exists") from e
+    finally:
+        conn.close()
     return user_id
 
-def get_user_by_email(email):
-    conn =get_db_connection()
-    cursor = conn.cursor()
 
-    cursor.execute("SELECT id, username, password_hash FROM users WHERE email = ?", (email,))
+def get_user_by_email(email: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, username, password_hash FROM users WHERE email = ?", (email,)
+    )
     user = cursor.fetchone()
     conn.close()
     return user
 
-def get_user_by_id(user_id):
+
+def get_user_by_id(user_id: int):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id, username, email FROM users WHERE id = ?", (user_id,))

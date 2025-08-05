@@ -170,70 +170,6 @@ def edit_event(eventid):
         return jsonify({"message": "Event deleted successfully"}), 204
 
 
-@api.route("/auth/register", methods=["POST"])
-def register():
-    data = request.get_json()
-    email = data.get("email", "").strip().lower()
-    username = data.get("username")
-    password = data.get("password")
-
-    if email is None or username is None or password is None:
-        return jsonify({"error": "Please fill out all fields!"}), 400
-
-    user_id = insert_user(email, username, password)
-
-    response = make_response(
-        jsonify(
-            {
-                "success": True,
-                "user_id": user_id,
-                "message": f"User {username} registered Successfully!",
-            }
-        )
-    )
-
-    response.set_cookie("user_id", str(user_id), httponly=True)
-
-    return response, 201
-
-
-@api.route("/auth/login", methods=["POST"])
-def login():
-    email = request.form["email"].strip().lower()
-    password = request.form["password"]
-
-    if email is None or password is None:
-        # TODO return user to login page indicating error
-        return jsonify({"error": "Email and Password are required!"}), 400
-
-    print(f"Looking for email: {email}")
-
-    user = get_user_by_email(email)
-
-    print("User found:", user)
-
-    if not user:
-        return jsonify({"success": False, "message": "User not found!"}), 404
-
-    user_id, username, password_hash = user
-
-    if password != password_hash:
-        return jsonify({"success": False, "message": "Incorrect Password!"}), 401
-
-    response = make_response(
-        jsonify(
-            {
-                "success": True,
-                "message": f"Welcome back, {username}!",
-                "user_id": user_id,
-            }
-        )
-    )
-    response.set_cookie("user_id", str(user_id), httponly=True)
-
-    return response, 200
-
-
 @api.route("/auth/logout", methods=["POST"])
 def logout():
     response = make_response(
@@ -271,6 +207,7 @@ def current_user():
 
     return jsonify({"success": True, "user": user_data}), 200
 
+
 @api.route("/attendees", methods=["GET"])
 def view_attendees():
     # TODO check_auth()
@@ -279,6 +216,7 @@ def view_attendees():
     conn.close()
     return jsonify([dict(row) for row in attendees])
 
+
 @api.route("/tickets", methods=["GET"])
 def view_tickets():
     # TODO check_auth()
@@ -286,6 +224,7 @@ def view_tickets():
     tickets = conn.execute("SELECT * FROM tickets").fetchall()
     conn.close()
     return jsonify([dict(row) for row in tickets])
+
 
 @api.route("/tickets/purchased", methods=["GET"])
 def view_purchased_tickets():

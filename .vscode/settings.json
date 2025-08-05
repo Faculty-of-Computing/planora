@@ -29,5 +29,6 @@
   "workbench.editorAssociations": {
     "*.svg": "imagePreview.previewEditor",
     ".md": "vscode.markdown.preview.editor"
-  }
+  },
+  "python.analysis.typeCheckingMode": "strict"
 }
