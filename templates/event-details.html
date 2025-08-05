@@ -32,6 +32,9 @@ Planora — Event: {{ event.title }}
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         background: #fff;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
     }
 
     .ticket-purchase p {
@@ -130,6 +133,10 @@ Planora — Event: {{ event.title }}
                 {% endif %}
             </button>
         </form>
+        <button type="button" id="share-event-btn" class="btn primary primary-foreground border"
+            title="Share this event">
+            Share Event
+        </button>
     </section>
 </main>
 
@@ -138,14 +145,32 @@ Planora — Event: {{ event.title }}
 </footer>
 
 <script>
-    const urls = {
-        sun: "/images/icons/sun-svgrepo-com.svg",
-        moon: "/images/icons/moon-stars-svgrepo-com.svg",
-        closeDark: "/images/icons/close-dark.svg",
-        closeLight: "/images/icons/close-light.svg",
-        menuDark: "/images/icons/menu-dark.svg",
-        menuLight: "/images/icons/menu-light.svg"
-    };
+    const shareBtn = document.getElementById('share-event-btn');
+    shareBtn?.addEventListener('click', async () => {
+        const shareData = {
+            title: '{{ event.title|e }}',
+            text: 'Check out this event on Planora!',
+            url: window.location.href,
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+                console.log('Event shared successfully');
+            } catch (err) {
+                alert('Sharing was cancelled or failed.');
+            }
+        } else {
+            // Fallback: copy URL to clipboard or just alert
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                alert('Event URL copied to clipboard!');
+            } catch {
+                alert('Share not supported on this browser.');
+            }
+        }
+    });
 </script>
+
 <script src="/js/index.js"></script>
 {% endblock %}
