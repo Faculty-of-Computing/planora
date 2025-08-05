@@ -270,3 +270,34 @@ def current_user():
     user_data = {"id": user[0], "username": user[1], "email": user[2]}
 
     return jsonify({"success": True, "user": user_data}), 200
+
+@api.route("/attendees", methods=["GET"])
+def view_attendees():
+    # TODO check_auth()
+    conn = get_db_connection()
+    attendees = conn.execute("SELECT * FROM attendees").fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in attendees])
+
+@api.route("/tickets", methods=["GET"])
+def view_tickets():
+    # TODO check_auth()
+    conn = get_db_connection()
+    tickets = conn.execute("SELECT * FROM tickets").fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in tickets])
+
+@api.route("/tickets/purchased", methods=["GET"])
+def view_purchased_tickets():
+    # TODO check_auth()
+    conn = get_db_connection()
+    results = conn.execute(
+        """
+        SELECT attendees.name AS attendee_name, tickets,type AS tickets.price, purchases AS purchases.quantity
+        FROM purchases
+        JOIN attendees ON purchases.attendee_id = attendees.id
+        JOIN tickets ON purchases.ticket_id = tickets.id
+    """
+    ).fetchall()
+    conn.close()
+    return jsonify([dict(row)] for row in results)
