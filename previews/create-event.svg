@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="700">
+    <!-- Navbar -->
+    <rect x="0" y="0" width="800" height="60" fill="white" stroke="black" />
+    <text x="20" y="35" font-size="20" fill="black">Planora</text>
+    <rect x="690" y="15" width="50" height="30" fill="white" stroke="black" />
+    <text x="700" y="35" font-size="14" fill="black">Login</text>
+    <rect x="745" y="15" width="50" height="30" fill="white" stroke="black" />
+    <text x="753" y="35" font-size="14" fill="black">Sign</text>
+
+    <!-- Page Title -->
+    <text x="20" y="90" font-size="24" fill="black">Create New Event</text>
+
+    <!-- Event Form -->
+    <rect x="20" y="100" width="760" height="500" fill="white" stroke="black" />
+
+    <!-- Title -->
+    <text x="40" y="130" font-size="14" fill="black">Event Title</text>
+    <rect x="40" y="140" width="700" height="30" fill="white" stroke="black" />
+
+    <!-- Description -->
+    <text x="40" y="190" font-size="14" fill="black">Description</text>
+    <rect x="40" y="200" width="700" height="80" fill="white" stroke="black" />
+
+    <!-- Date -->
+    <text x="40" y="300" font-size="14" fill="black">Date</text>
+    <rect x="40" y="310" width="200" height="30" fill="white" stroke="black" />
+
+    <!-- Location -->
+    <text x="260" y="300" font-size="14" fill="black">Location</text>
+    <rect x="260" y="310" width="200" height="30" fill="white" stroke="black" />
+
+    <!-- Ticket Price -->
+    <text x="480" y="300" font-size="14" fill="black">Ticket Price</text>
+    <rect x="480" y="310" width="100" height="30" fill="white" stroke="black" />
+
+    <!-- Upload Image -->
+    <text x="40" y="360" font-size="14" fill="black">Upload Banner Image</text>
+    <rect x="40" y="370" width="300" height="40" fill="white" stroke="black" />
+    <text x="150" y="395" font-size="12" fill="black">Choose File</text>
+
+    <!-- Ticket Tiers Section -->
+    <text x="40" y="430" font-size="14" fill="black">Add Ticket Options</text>
+    <rect x="40" y="440" width="500" height="30" fill="white" stroke="black" />
+    <text x="50" y="460" font-size="12" fill="black">Example: VIP - $50</text>
+    <rect x="550" y="440" width="80" height="30" fill="white" stroke="black" />
+    <text x="565" y="460" font-size="12" fill="black">Add</text>
+
+    <!-- Submit Button -->
+    <rect x="650" y="550" width="100" height="40" fill="white" stroke="black" />
+    <text x="670" y="575" font-size="14" fill="black">Create</text>
+
+    <!-- Footer -->
+    <rect x="0" y="660" width="800" height="40" fill="white" stroke="black" />
+    <text x="20" y="685" font-size="12" fill="black">© 2025 Planora - All rights reserved</text>
+</svg>

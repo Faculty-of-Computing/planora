@@ -1,87 +1,295 @@
-from flask import Flask, jsonify, request, abort
+from flask import Blueprint, request, jsonify, make_response
+from db import insert_user, get_user_by_email, get_user_by_id, get_db_connection
 import sqlite3
-import os
 
-app = Flask(__name__)
-DATABASE = "planora.db"
-API_KEY = "tightkeychain001"  # Only organizers should know this
+api = Blueprint("api", __name__, url_prefix="/api")
 
 
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
+@api.route("/")
+def events():
+    return jsonify({"hello": "World"})
 
 
-def init_db():
-    conn = sqlite3.connect(DATABASE)
-    with conn:
+@api.route("/events/<int:event_id>/register", methods=["POST"])
+def register_for_event(event_id):
+    """Register a user for an event."""
 
-        # For Attendees
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS attendees (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL, 
-                email TEXT NOT NULL UNIQUE
-            )
-        """
-        )
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
 
-        #  For Tickets
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS tickets (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                type TEXT NOT NULL,
-                price INTEGER NOT NULL
-            )
-        """
-        )
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-        # For Tickets Bought
-        conn.execute(
-            """"
-            CREATE TABLE IF NOT EXISTS purchases (
-                id INTEGER PRIMARY KEY AUTOINCREMENT
-                attendee_id INTEGER,
-                ticket_id INTEGER,
-                quantity INTEGER NOT NULL,
-                FOREIGN KEY (attendee_id) REFERENCES atrendees(id),
-                FOREIGN KEY (ticket_id) REFERENCES tickets(id)         
-            );             
-        """
+    cursor.execute("SELECT id FROM events WHERE id = ?", (event_id,))
+    event = cursor.fetchone()
+    if not event:
+        conn.close()
+        return jsonify({"error": "Event not found"}), 404
+
+    uid = int(user_id)
+    cursor.execute("SELECT id FROM users WHERE id = ?", (uid,))
+    user = cursor.fetchone()
+    if not user:
+        conn.close()
+        return jsonify({"error": "User not found"}), 404
+
+    try:
+        cursor.execute(
+            "INSERT INTO registrations (user_id, event_id) VALUES (?, ?)",
+            (uid, event_id),
         )
         conn.commit()
+        return jsonify({"message": "Successfully registered for event"}), 201
+    except sqlite3.IntegrityError as e:
+        if (
+            "UNIQUE constraint failed: registrations.user_id, registrations.event_id"
+            in str(e)
+        ):
+            return jsonify({"error": "User already registered for this event"}), 409
+        return jsonify({"error": "Database error"}), 500
+    finally:
+        conn.close()
 
 
-def check_auth():
-    key = request.args.get("key")
-    if key != API_KEY:
-        abort(403)
+@api.route("/events", methods=["POST", "GET"])
+def addevent():
+    if request.method == "POST":
+        user_id = request.cookies.get("user_id")
+        if not user_id:
+            return jsonify({"error": "User not logged in"}), 401
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        name = request.form.get("title")
+        description = request.form.get("description")
+        date = request.form.get("date")
+        location = request.form.get("location")
+        price = request.form.get("price")
+
+        uid = int(user_id)
+        cursor.execute(
+            "INSERT INTO events (creator_id, title, description, date, location, price) VALUES(?, ?, ?, ?, ?, ?)",
+            (uid, name, description, date, location, price),
+        )
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Event added successfully"}), 201
+
+    if request.method == "GET":
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM events")
+        events = cursor.fetchall()
+        conn.close()
+
+        # Convert rows to dicts for JSON response
+        event_list = [dict(event) for event in events]
+
+        return jsonify(event_list), 200
 
 
-@app.route("/attendees", methods=["GET"])
+@api.route("/events/<int:eventid>", methods=["GET", "PUT", "DELETE"])
+def edit_event(eventid):
+    if request.method == "GET":
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM events WHERE id = ?", (eventid,))
+        event = cursor.fetchone()
+        conn.close()
+
+        if event:
+            return jsonify(dict(event))
+        else:
+            return jsonify({"error": "Event not found"}), 404
+
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if request.method == "PUT":
+        cursor.execute("SELECT * FROM events WHERE id = ?", (eventid,))
+        event = cursor.fetchone()
+
+        if not event:
+            conn.close()
+            return jsonify({"error": "Event not found"}), 404
+
+        if event["creator_id"] != int(user_id):
+            conn.close()
+            return (
+                jsonify({"error": "You do not have permission to edit this event"}),
+                403,
+            )
+
+        name = request.form.get("title")
+        description = request.form.get("description")
+        date = request.form.get("date")
+        location = request.form.get("location")
+        price = request.form.get("price")
+
+        cursor.execute(
+            """
+            UPDATE events 
+            SET title = ?, description = ?, date = ?, location = ?, price = ? 
+            WHERE id = ?
+            """,
+            (name, description, date, location, price, eventid),
+        )
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Event updated successfully"})
+
+    if request.method == "DELETE":
+        cursor.execute("SELECT * FROM events WHERE id = ?", (eventid,))
+        event = cursor.fetchone()
+        if not event:
+            conn.close()
+            return jsonify({"error": "Event not found"}), 404
+
+        if event["creator_id"] != int(user_id):
+            conn.close()
+            return (
+                jsonify({"error": "You do not have permission to delete this event"}),
+                403,
+            )
+
+        cursor.execute("DELETE FROM events WHERE id = ?", (eventid,))
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": "Event deleted successfully"}), 204
+
+
+@api.route("/auth/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    email = data.get("email", "").strip().lower()
+    username = data.get("username")
+    password = data.get("password")
+
+    if email is None or username is None or password is None:
+        return jsonify({"error": "Please fill out all fields!"}), 400
+
+    user_id = insert_user(email, username, password)
+
+    response = make_response(
+        jsonify(
+            {
+                "success": True,
+                "user_id": user_id,
+                "message": f"User {username} registered Successfully!",
+            }
+        )
+    )
+
+    response.set_cookie("user_id", str(user_id), httponly=True)
+
+    return response, 201
+
+
+@api.route("/auth/login", methods=["POST"])
+def login():
+    email = request.form["email"].strip().lower()
+    password = request.form["password"]
+
+    if email is None or password is None:
+        # TODO return user to login page indicating error
+        return jsonify({"error": "Email and Password are required!"}), 400
+
+    print(f"Looking for email: {email}")
+
+    user = get_user_by_email(email)
+
+    print("User found:", user)
+
+    if not user:
+        return jsonify({"success": False, "message": "User not found!"}), 404
+
+    user_id, username, password_hash = user
+
+    if password != password_hash:
+        return jsonify({"success": False, "message": "Incorrect Password!"}), 401
+
+    response = make_response(
+        jsonify(
+            {
+                "success": True,
+                "message": f"Welcome back, {username}!",
+                "user_id": user_id,
+            }
+        )
+    )
+    response.set_cookie("user_id", str(user_id), httponly=True)
+
+    return response, 200
+
+
+@api.route("/auth/logout", methods=["POST"])
+def logout():
+    response = make_response(
+        jsonify(
+            {"success": True, "message": "Logout successful, session cookie cleared."}
+        )
+    )
+
+    response.set_cookie("user_id", "", expires=0, httponly=True)
+
+    return response, 200
+
+
+@api.route("/auth/me", methods=["GET"])
+def current_user():
+    user_id = request.cookies.get("user_id")
+
+    if not user_id:
+        return (
+            jsonify(
+                {"success": False, "message": "Unauthorized. No session cookie found."}
+            ),
+            401,
+        )
+
+    user = get_user_by_id(user_id)
+
+    if not user:
+        return (
+            jsonify({"success": False, "message": "Invalid session. User not found."}),
+            401,
+        )
+
+    user_data = {"id": user[0], "username": user[1], "email": user[2]}
+
+    return jsonify({"success": True, "user": user_data}), 200
+
+@api.route("/attendees", methods=["GET"])
 def view_attendees():
-    check_auth()
+    # TODO check_auth()
     conn = get_db_connection()
     attendees = conn.execute("SELECT * FROM attendees").fetchall()
     conn.close()
     return jsonify([dict(row) for row in attendees])
 
-
-@app.route("/tickets", methods=["GET"])
+@api.route("/tickets", methods=["GET"])
 def view_tickets():
-    check_auth()
+    # TODO check_auth()
     conn = get_db_connection()
     tickets = conn.execute("SELECT * FROM tickets").fetchall()
     conn.close()
     return jsonify([dict(row) for row in tickets])
 
-
-@app.route("/tickets/purchased", methods=["GET"])
+@api.route("/tickets/purchased", methods=["GET"])
 def view_purchased_tickets():
-    check_auth()
+    # TODO check_auth()
     conn = get_db_connection()
     results = conn.execute(
         """
@@ -93,9 +301,3 @@ def view_purchased_tickets():
     ).fetchall()
     conn.close()
     return jsonify([dict(row)] for row in results)
-
-
-if __name__ == "__main__":
-    if not os.path.exists(DATABASE):
-        init_db()
-    app.run(debug=True)

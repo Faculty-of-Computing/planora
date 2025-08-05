@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
+  <!-- Navbar -->
+  <rect x="0" y="0" width="800" height="60" fill="white" stroke="black"/>
+  <text x="20" y="35" font-size="20" fill="black">Planora</text>
+  <rect x="690" y="15" width="50" height="30" fill="white" stroke="black"/>
+  <text x="700" y="35" font-size="14" fill="black">Login</text>
+  <rect x="745" y="15" width="50" height="30" fill="white" stroke="black"/>
+  <text x="753" y="35" font-size="14" fill="black">Sign</text>
+
+  <!-- Event Title -->
+  <text x="20" y="90" font-size="24" fill="black">Music Concert</text>
+
+  <!-- Banner Image -->
+  <rect x="20" y="100" width="500" height="200" fill="white" stroke="black"/>
+  <text x="230" y="210" font-size="14" fill="black">Event Image</text>
+
+  <!-- Event Info -->
+  <rect x="540" y="100" width="240" height="200" fill="white" stroke="black"/>
+  <text x="550" y="130" font-size="14" fill="black">📅 Date: Aug 5</text>
+  <text x="550" y="155" font-size="14" fill="black">📍 Location: Main Hall</text>
+  <text x="550" y="180" font-size="14" fill="black">👥 Attendees: 120</text>
+  <rect x="550" y="200" width="200" height="30" fill="white" stroke="black"/>
+  <text x="600" y="220" font-size="14" fill="black">Register</text>
+  <rect x="550" y="240" width="200" height="30" fill="white" stroke="black"/>
+  <text x="610" y="260" font-size="14" fill="black">Buy Ticket</text>
+
+  <!-- Description -->
+  <text x="20" y="330" font-size="18" fill="black">Event Description</text>
+  <rect x="20" y="340" width="760" height="100" fill="white" stroke="black"/>
+  <text x="30" y="370" font-size="12" fill="black">This music concert brings together...</text>
+
+  <!-- Tickets Section -->
+  <text x="20" y="470" font-size="18" fill="black">Ticket Options</text>
+  <rect x="20" y="480" width="230" height="80" fill="white" stroke="black"/>
+  <text x="30" y="500" font-size="14" fill="black">🎟 General Admission - $20</text>
+  <rect x="200" y="490" width="40" height="20" fill="white" stroke="black"/>
+  <text x="205" y="505" font-size="12" fill="black">Buy</text>
+
+  <rect x="280" y="480" width="230" height="80" fill="white" stroke="black"/>
+  <text x="290" y="500" font-size="14" fill="black">🎟 VIP Ticket - $50</text>
+  <rect x="460" y="490" width="40" height="20" fill="white" stroke="black"/>
+  <text x="465" y="505" font-size="12" fill="black">Buy</text>
+
+  <!-- Footer -->
+  <rect x="0" y="560" width="800" height="40" fill="white" stroke="black"/>
+  <text x="20" y="585" font-size="12" fill="black">© 2025 Planora - All rights reserved</text>
+</svg>
