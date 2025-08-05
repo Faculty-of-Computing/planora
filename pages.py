@@ -1,6 +1,14 @@
 # NOTE THESE PAGES REQUIRE THAT THE USER MUST BE AUTHENTICATED
 
-from flask import Response, render_template, Blueprint, request, redirect, url_for
+from flask import (
+    Response,
+    render_template,
+    Blueprint,
+    request,
+    redirect,
+    url_for,
+    abort,
+)
 import utils
 import db
 
@@ -20,7 +28,7 @@ def home():
 
 
 @pages.route("/events/<int:event_id>/image")
-def event_image():
+def event_image(event_id: int):
     conn = db.get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT image, image_mime FROM events WHERE id = ?", (event_id,))
@@ -77,9 +85,36 @@ def create_event():
         return redirect(f"/events/{event_id}")
 
 
-@pages.route("/events/<int:event_id>")
-def details(event_id: int):
-    return render_template("details.html")
+@pages.route("/events/<int:event_id>", methods=["GET", "POST"])
+def event_details(event_id: int):
+    # Assume user_id is always set (from cookies or session)
+    user_id = int(request.cookies.get("user_id"))  # type: ignore
+
+    if request.method == "POST":
+        if db.is_user_registered_for_event(user_id, event_id):
+            db.unregister_user_from_event(user_id, event_id)
+        else:
+            db.register_user_for_event(user_id, event_id)
+        return redirect(url_for("pages.event_details", event_id=event_id))
+
+    event = db.get_event_by_id(event_id)
+    if not event:
+        abort(404, description="Event not found")
+
+    event["attendees"] = db.count_event_registrations(event_id)
+
+    # Provide image URL or default image path
+    event["image_url"] = (
+        url_for("pages.event_image", event_id=event_id)
+        if db.event_has_image(event_id)
+        else "/images/planora.png"
+    )
+
+    user_registered = db.is_user_registered_for_event(user_id, event_id)
+
+    return render_template(
+        "event-details.html", event=event, user_registered=user_registered
+    )
 
 
 @pages.route("/profile")

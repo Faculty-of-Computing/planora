@@ -159,13 +159,13 @@ Planora — Event Management System
 </footer>
 <script>
     const urls = {
-        sun: "{{ url_for('static', filename='images/icons/sun-svgrepo-com.svg') }}",
-        moon: "{{ url_for('static', filename='images/icons/moon-stars-svgrepo-com.svg') }}",
-        closeDark: "{{ url_for('static', filename='images/icons/close-dark.svg') }}",
-        closeLight: "{{ url_for('static', filename='images/icons/close-light.svg') }}",
-        menuDark: "{{ url_for('static', filename='images/icons/menu-dark.svg') }}",
-        menuLight: "{{ url_for('static', filename='images/icons/menu-light.svg') }}"
+        sun: "/images/icons/sun-svgrepo-com.svg",
+        moon: "/images/icons/moon-stars-svgrepo-com.svg",
+        closeDark: "/images/icons/close-dark.svg",
+        closeLight: "/images/icons/close-light.svg",
+        menuDark: "/images/icons/menu-dark.svg",
+        menuLight: "/images/icons/menu-light.svg"
     };
 </script>
-<script src="{{url_for('static', filename ='/js/index.js"></script>
+<script src="/js/index.js"></script>
 {%endblock%}

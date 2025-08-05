@@ -79,37 +79,6 @@ def create_tables():
         """
     )
 
-    # Ticket options table
-    c.execute(
-        """
-        CREATE TABLE IF NOT EXISTS ticket_options (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            event_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            price REAL NOT NULL,
-            quantity_available INTEGER NOT NULL,
-            FOREIGN KEY (event_id) REFERENCES events(id)
-        )
-        """
-    )
-
-    # Tickets table
-    c.execute(
-        """
-        CREATE TABLE IF NOT EXISTS tickets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            event_id INTEGER NOT NULL,
-            ticket_option_id INTEGER NOT NULL,
-            owner_id INTEGER NOT NULL,
-            purchase_date TEXT NOT NULL, -- ISO datetime string
-            qr_code_url TEXT,
-            FOREIGN KEY (event_id) REFERENCES events(id),
-            FOREIGN KEY (ticket_option_id) REFERENCES ticket_options(id),
-            FOREIGN KEY (owner_id) REFERENCES users(id)
-        )
-        """
-    )
-
     conn.commit()
     conn.close()
 
@@ -189,3 +158,80 @@ def insert_event(
     conn.commit()
     conn.close()
     return event_id
+
+
+def get_event_by_id(event_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, title, description, date, location, price FROM events WHERE id = ?",
+        (event_id,),
+    )
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return dict(row)
+    return None
+
+
+def count_event_registrations(event_id: int) -> int:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT COUNT(*) AS count FROM registrations WHERE event_id = ?",
+        (event_id,),
+    )
+    count = cursor.fetchone()["count"]
+    conn.close()
+    return count
+
+
+def event_has_image(event_id: int) -> bool:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT image FROM events WHERE id = ? AND image IS NOT NULL AND LENGTH(image) > 0",
+        (event_id,),
+    )
+    exists = cursor.fetchone() is not None
+    conn.close()
+    return exists
+
+
+def is_user_registered_for_event(user_id: int, event_id: int) -> bool:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT 1 FROM registrations WHERE user_id = ? AND event_id = ?",
+        (user_id, event_id),
+    )
+    exists = cursor.fetchone() is not None
+    conn.close()
+    return exists
+
+
+def register_user_for_event(user_id: int, event_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO registrations (user_id, event_id) VALUES (?, ?)",
+            (user_id, event_id),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        # User already registered
+        pass
+    finally:
+        conn.close()
+
+
+def unregister_user_from_event(user_id: int, event_id: int):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "DELETE FROM registrations WHERE user_id = ? AND event_id = ?",
+        (user_id, event_id),
+    )
+    conn.commit()
+    conn.close()
