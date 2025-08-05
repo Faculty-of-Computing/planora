@@ -90,6 +90,7 @@ def login():
 def ticket():
     return render_template("ticket.html")
 
+
 @pages.route("/event/<int:event_id>/edit", methods=["GET", "POST"])
 def edit_event(event_id):
     # Sample event data - replace with database query
@@ -108,3 +109,7 @@ def edit_event(event_id):
         return redirect(url_for("pages.details", event_id=event_id))
 
     return render_template("edit-event.html", event=event)
+
+@pages.route("/register")
+def register():
+    return render_template("sign-up.html")
