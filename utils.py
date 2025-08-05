@@ -1,4 +1,4 @@
-from flask import make_response, redirect
+from flask import make_response, redirect, request
 
 
 def set_user_cookie_and_recirect(
@@ -13,3 +13,11 @@ def set_user_cookie_and_recirect(
         samesite="Lax",
     )
     return response
+
+
+def user_is_authenticated() -> bool:
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        return False
+    else:
+        return True

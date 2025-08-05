@@ -5,7 +5,7 @@ Planora — Event Management System
 {%endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{url_for('static', filename='css/home.css')}}" />
+<link rel="stylesheet" href="/css/home.css" />
 {% endblock %}
 
 {%block body%}
@@ -13,32 +13,36 @@ Planora — Event Management System
 <nav class="secondary">
     <!-- Product Logo -->
     <div class="logo">
-        <img src="{{url_for( 'static', filename='images/planora.png')}}" alt="">
+        <img src="/images/planora.png" alt="">
     </div>
     <!-- Desktop Menu -->
     <div class="menu">
         <div class="theme-toggler border">
-            <img src="{{url_for('static', filename='images/icons/moon-stars-svgrepo-com.svg')}}" alt="">
+            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="">
         </div>
         <div class="container">
             <input type="text" class="border foreground" placeholder="Search">
+            <a href="/events/create" class="btn primary primary-foreground border">Create Event</a>
+            <!-- <a href="#" class="btn secondary border foreground">Sign Up</a> -->
         </div>
     </div>
     <!-- Mobile Menu -->
     <div class="mobile-menu">
         <div class="theme-toggler border">
-            <img src="{{url_for('static', filename='images/icons/moon-stars-svgrepo-com.svg')}}" alt="">
+            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="">
         </div>
         <!-- Hamburger icon -->
         <div class="menu-icon">
-            <img src="{{url_for('static', filename='images/icons/menu-dark.svg')}}" alt="">
+            <img src="/images/icons/menu-dark.svg" alt="">
         </div>
         <div class="container background">
             <!-- Close icon -->
             <div class="close-icon">
-                <img src="{{url_for('static', filename='images/icons/close-dark.svg')}}" alt="">
+                <img src="/images/icons/close-dark.svg" alt="">
             </div>
             <input type="text" class="border foreground" placeholder="Search">
+            <a href="/events/create" class="btn primary primary-foreground border">Create Event</a>
+            <!-- <a href="#" class="btn secondary border foreground">Sign Up</a> -->
         </div>
     </div>
 </nav>
@@ -163,5 +167,5 @@ Planora — Event Management System
         menuLight: "{{ url_for('static', filename='images/icons/menu-light.svg') }}"
     };
 </script>
-<script src="{{url_for('static', filename ='/js/index.js')}}"></script>
+<script src="{{url_for('static', filename ='/js/index.js"></script>
 {%endblock%}

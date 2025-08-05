@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}
+Planora — Event Management System
+{%endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/css/home.css" />
+{% endblock %}
+
+{%block body%}
+<nav class="secondary">
+    <div class="logo">
+        <img src="/images/planora.png" alt="">
+    </div>
+    <div class="menu">
+        <div class="theme-toggler border">
+            <img src="images/icons/moon-stars-svgrepo-com.svg" alt="">
+        </div>
+        <div class="container">
+            <a href="/home" class="btn primary primary-foreground border">Back</a>
+            <!-- <a href="#" class="btn secondary border foreground">Sign Up</a> -->
+        </div>
+    </div>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="create">
+        <div class="theme-toggler border">
+            <img src="images/icons/moon-stars-svgrepo-com.svg" alt="">
+        </div>
+        <!-- Hamburger icon -->
+        <div class="menu-icon">
+            <img src="images/icons/menu-dark.svg" alt="">
+        </div>
+        <div class="container background">
+            <!-- Close icon -->
+            <div class="close-icon">
+                <img src="images/icons/close-dark.svg" alt="">
+            </div>
+            <a href="/home" class="btn primary primary-foreground border">Back</a>
+            <!-- <a href="#" class="btn secondary border foreground">Sign Up</a> -->
+        </div>
+    </div>
+</nav>
+<main class="background">
+    <h1 class="primary-foreground">Create New Event</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% if error %}
+        <div class="error-message" style="color: red; margin-bottom: 1rem;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <label for="event-title" class="primary-foreground">Event Title</label>
+        <input type="text" id="event-title" name="title" class="foreground border" required
+            value="{{ request.form.title or '' }}">
+
+        <label for="description" class="primary-foreground">Event Description</label>
+        <textarea id="description" name="description" class="foreground border"
+            required>{{ request.form.description or '' }}</textarea>
+
+        <div class="search-field-container flex">
+            <div class="date-field flex column">
+                <label for="date" class="primary-foreground">Date</label>
+                <input id="date" name="date" class="border foreground" type="date" required
+                    value="{{ request.form.date or '' }}">
+            </div>
+            <div class="location-field flex column">
+                <label for="location" class="primary-foreground">Location</label>
+                <input type="text" id="location" name="location" class="border foreground"
+                    value="{{ request.form.location or '' }}">
+            </div>
+        </div>
+
+        <label for="ticket-price" class="primary-foreground">Ticket Price</label>
+        <input type="number" id="ticket-price" name="price" placeholder="Price" step="0.1" min="1"
+            class="border foreground" required value="{{ request.form.price or '' }}">
+
+        <label class="primary-foreground">Upload Banner Image</label>
+        <input type="file" name="image" id="upload" class="foreground border" hidden required accept="image/*">
+        <label for="upload" class="btn secondary upload-field primary-foreground border">Choose Image</label>
+
+        <button type="submit" class="btn primary primary-foreground border">Create Event</button>
+    </form>
+    <script>
+        const fileInput = document.getElementById('upload');
+        const label = document.querySelector('label[for="upload"]');
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                label.textContent = fileInput.files[0].name;
+            } else {
+                label.textContent = 'Choose Image';
+            }
+        });
+    </script>
+</main>
+<footer class="secondary">
+    <p class="foreground">&copy;2025 Planora-All Rights Reserved</p>
+</footer>
+<script>
+    const urls = {
+        sun: "images/icons/sun-svgrepo-com.svg",
+        moon: "images/icons/moon-stars-svgrepo-com.svg",
+        closeDark: "images/icons/close-dark.svg",
+        closeLight: "images/icons/close-light.svg",
+        menuDark: "images/icons/menu-dark.svg",
+        menuLight: "images/icons/menu-light.svg"
+    };
+</script>
+<script src="/js/index.js"></script>
+{%endblock%}

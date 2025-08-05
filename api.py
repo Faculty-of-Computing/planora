@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, make_response
-from db import insert_user, get_user_by_email, get_user_by_id, get_db_connection
+from db import get_user_by_id, get_db_connection
 import sqlite3
 
 api = Blueprint("api", __name__, url_prefix="/api")
@@ -54,31 +54,6 @@ def register_for_event(event_id):
 
 @api.route("/events", methods=["POST", "GET"])
 def addevent():
-    if request.method == "POST":
-        user_id = request.cookies.get("user_id")
-        if not user_id:
-            return jsonify({"error": "User not logged in"}), 401
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        name = request.form.get("title")
-        description = request.form.get("description")
-        date = request.form.get("date")
-        location = request.form.get("location")
-        price = request.form.get("price")
-
-        uid = int(user_id)
-        cursor.execute(
-            "INSERT INTO events (creator_id, title, description, date, location, price) VALUES(?, ?, ?, ?, ?, ?)",
-            (uid, name, description, date, location, price),
-        )
-
-        conn.commit()
-        conn.close()
-
-        return jsonify({"message": "Event added successfully"}), 201
-
     if request.method == "GET":
         conn = get_db_connection()
         cursor = conn.cursor()

@@ -1,15 +1,16 @@
 # NOTE THESE PAGES REQUIRE THAT THE USER MUST BE AUTHENTICATED
 
-from flask import render_template, Blueprint, request, redirect, url_for
+from flask import Response, render_template, Blueprint, request, redirect, url_for
+import utils
+import db
 
 pages = Blueprint("pages", __name__)
 
 
-# NOTE MIDDLEWARE TO REQUIRE AUTH
+# SECTION MIDDLEWARE TO REQUIRE AUTH
 @pages.before_request
 def require_login():
-    user_id = request.cookies.get("user_id")
-    if not user_id:
+    if utils.user_is_authenticated() == False:
         return redirect("/login")
 
 
@@ -18,12 +19,65 @@ def home():
     return render_template("home.html")
 
 
-@pages.route("/events/create")
-def create():
-    return render_template("create.html")
+@pages.route("/events/<int:event_id>/image")
+def event_image():
+    conn = db.get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT image, image_mime FROM events WHERE id = ?", (event_id,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row and row["image"]:
+        return Response(row["image"], mimetype=row["image_mime"])
+    return None
 
 
-@pages.route("/events/<int:event_id>/details")
+@pages.route("/events/create", methods=["POST", "GET"])
+def create_event():
+    if request.method == "GET":
+        return render_template("create-event.html", error=None)
+
+    if request.method == "POST":
+        user_id: str = request.cookies.get("user_id")  # type: ignore
+
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        date = request.form.get("date", "").strip()
+        location = request.form.get("location", "").strip()
+        price = request.form.get("price", "").strip()
+        image_file = request.files.get("image")
+
+        if not (title and description and date and price and image_file):
+            return render_template(
+                "create-event.html", error="Please fill in all required fields."
+            )
+
+        try:
+            creator_id = int(user_id)
+            price_val = float(price)
+            if price_val < 0:
+                return render_template(
+                    "create-event.html", error="Price must be zero or positive."
+                )
+        except ValueError:
+            return render_template(
+                "create-event.html", error="Invalid user ID or price."
+            )
+
+        event_id = db.insert_event(
+            creator_id=creator_id,
+            title=title,
+            description=description,
+            date=date,
+            location=location,
+            price=price_val,
+            image_file=image_file,
+        )
+
+        return redirect(f"/events/{event_id}")
+
+
+@pages.route("/events/<int:event_id>")
 def details(event_id: int):
     return render_template("details.html")
 

@@ -1,4 +1,5 @@
 import sqlite3
+from werkzeug.datastructures import FileStorage
 
 
 def get_db_connection():
@@ -18,7 +19,7 @@ def reset_database():
         FROM sqlite_master 
         WHERE type='table' 
         AND name NOT LIKE 'sqlite_%';
-    """
+        """
     )
     tables = cursor.fetchall()
 
@@ -37,74 +38,76 @@ def create_tables():
     # Users table
     c.execute(
         """
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        username TEXT NOT NULL,
-        password_hash TEXT NOT NULL
-    )
-    """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            username TEXT NOT NULL,
+            password_hash TEXT NOT NULL
+        )
+        """
     )
 
-    # Events table
+    # Events table with BLOB image and MIME type
     c.execute(
         """
-    CREATE TABLE IF NOT EXISTS events (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        creator_id INTEGER NOT NULL,
-        title TEXT NOT NULL,
-        description TEXT NOT NULL,
-        date TEXT NOT NULL, -- ISO date string
-        location TEXT,
-        price REAL,
-        FOREIGN KEY (creator_id) REFERENCES users(id)
-    )
-    """
+        CREATE TABLE IF NOT EXISTS events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            creator_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            date TEXT NOT NULL, -- ISO date string
+            location TEXT,
+            price REAL,
+            image BLOB, -- Store binary image data
+            image_mime TEXT, -- Store MIME type (e.g., image/png)
+            FOREIGN KEY (creator_id) REFERENCES users(id)
+        )
+        """
     )
 
     # Registrations table
     c.execute(
         """
-    CREATE TABLE IF NOT EXISTS registrations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        event_id INTEGER NOT NULL,
-        UNIQUE(user_id, event_id),
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (event_id) REFERENCES events(id)
-    )
-    """
+        CREATE TABLE IF NOT EXISTS registrations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            event_id INTEGER NOT NULL,
+            UNIQUE(user_id, event_id),
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (event_id) REFERENCES events(id)
+        )
+        """
     )
 
     # Ticket options table
     c.execute(
         """
-    CREATE TABLE IF NOT EXISTS ticket_options (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        event_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        price REAL NOT NULL,
-        quantity_available INTEGER NOT NULL,
-        FOREIGN KEY (event_id) REFERENCES events(id)
-    )
-    """
+        CREATE TABLE IF NOT EXISTS ticket_options (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            event_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            price REAL NOT NULL,
+            quantity_available INTEGER NOT NULL,
+            FOREIGN KEY (event_id) REFERENCES events(id)
+        )
+        """
     )
 
     # Tickets table
     c.execute(
         """
-    CREATE TABLE IF NOT EXISTS tickets (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        event_id INTEGER NOT NULL,
-        ticket_option_id INTEGER NOT NULL,
-        owner_id INTEGER NOT NULL,
-        purchase_date TEXT NOT NULL, -- ISO datetime string
-        qr_code_url TEXT,
-        FOREIGN KEY (event_id) REFERENCES events(id),
-        FOREIGN KEY (ticket_option_id) REFERENCES ticket_options(id),
-        FOREIGN KEY (owner_id) REFERENCES users(id)
-    )
-    """
+        CREATE TABLE IF NOT EXISTS tickets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            event_id INTEGER NOT NULL,
+            ticket_option_id INTEGER NOT NULL,
+            owner_id INTEGER NOT NULL,
+            purchase_date TEXT NOT NULL, -- ISO datetime string
+            qr_code_url TEXT,
+            FOREIGN KEY (event_id) REFERENCES events(id),
+            FOREIGN KEY (ticket_option_id) REFERENCES ticket_options(id),
+            FOREIGN KEY (owner_id) REFERENCES users(id)
+        )
+        """
     )
 
     conn.commit()
@@ -146,3 +149,43 @@ def get_user_by_id(user_id: int):
     user = cursor.fetchone()
     conn.close()
     return user
+
+
+def insert_event(
+    creator_id: int,
+    title: str,
+    description: str,
+    date: str,
+    location: str,
+    price: float,
+    image_file: FileStorage,
+):
+    """
+    image_file: FileStorage object from Flask (request.files['image'])
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    image_bytes = image_file.read()
+    image_mime = image_file.mimetype
+
+    cursor.execute(
+        """
+        INSERT INTO events (creator_id, title, description, date, location, price, image, image_mime)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            creator_id,
+            title,
+            description,
+            date,
+            location,
+            price,
+            image_bytes,
+            image_mime,
+        ),
+    )
+    event_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return event_id

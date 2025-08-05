@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect
 import db
 import sqlite3
 import utils
@@ -9,7 +9,10 @@ public = Blueprint("public", __name__)
 
 @public.route("/")
 def index():
-    return render_template("index.html")
+    if utils.user_is_authenticated():
+        return redirect("/home")
+    else:
+        return render_template("index.html")
 
 
 @public.route("/login", methods=["GET", "POST"])
