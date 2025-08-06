@@ -1,164 +1,137 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 
 {% block title %}
 Planora — Event: {{ event.title }}
 {% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="/css/home.css" />
-<style>
-    .hero-img-container {
-        width: 100%;
-        max-width: 800px;
-        height: 450px;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        border-radius: 6px;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .event-details {
-        flex: 1;
-        padding: 1rem;
-    }
-
-    .ticket-purchase {
-        max-width: 320px;
-        margin: 1.5rem auto;
-        padding: 1.5rem 2rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        background: #fff;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-    }
-
-    .ticket-purchase p {
-        font-size: 1.5rem;
-        margin-bottom: 1.2rem;
-        font-weight: 600;
-        color: #222;
-    }
-
-    .ticket-purchase button {
-        background-color: #4a90e2;
-        color: white;
-        font-size: 1.2rem;
-        padding: 0.8rem 2rem;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .ticket-purchase button:disabled {
-        background-color: #aaa;
-        cursor: not-allowed;
-    }
-
-    .ticket-purchase button:hover:not(:disabled) {
-        background-color: #357ABD;
-    }
-
-    @media (max-width: 768px) {
-        .hero-img-container {
-            height: 300px;
-        }
-
-        .ticket-purchase {
-            max-width: 90%;
-            margin: 1rem auto;
-            padding: 1rem 1.5rem;
-        }
-    }
-</style>
+{# Remove any redundant stylesheets or inline styles here, as Tailwind should handle most styling #}
 {% endblock %}
 
 {% block body %}
-<nav class="secondary">
-    <div class="logo">
-        <img src="/images/planora.png" alt="Planora Logo" />
-    </div>
-    <div class="menu">
-        <div class="container">
-            <a href="/home" class="btn primary primary-foreground border">Home</a>
-        </div>
-        <div class="theme-toggler border">
-            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="Toggle Theme" />
-        </div>
-    </div>
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="create">
-        <div class="theme-toggler border">
-            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="Toggle Theme" />
-        </div>
-        <div class="menu-icon">
-            <img src="/images/icons/menu-dark.svg" alt="Menu" />
-        </div>
-        <div class="container background">
-            <div class="close-icon">
-                <img src="/images/icons/close-dark.svg" alt="Close" />
-            </div>
-            <a href="/home" class="btn primary primary-foreground border">Home</a>
-        </div>
-    </div>
-</nav>
+{# The main content area of base2.html already provides 'my-6 mx-4 space-y-8 grow-[1]',
+so we can just focus on the content within this block. #}
 
-<main class="background">
-    <h1 class="foreground">{{ event.title }}</h1>
-    <section class="flex flex-wrap hero secondary" style="align-items: flex-start;">
-        <div class="hero-img-container" style="background-image: url('{{ event.image_url }}')"
-            aria-label="Event Banner Image" role="img"></div>
+<!-- Main Event Title -->
+<h1 class="text-4xl font-extrabold text-foreground mb-6 text-center md:text-left">
+    {{ event.title }}
+</h1>
 
-        <!-- Event details container -->
-        <div class="event-details flex border column secondary">
-            <p class="foreground">🗓️ Date: {{ event.date }}</p>
-            <p class="foreground">📍 Location: {{ event.location or "TBA" }}</p>
-            <p class="foreground">👥 Attendees: {{ event.attendees or 0 }}</p>
-            <p class="foreground">🎟️ Tickets Available: {{ event.tickets_available or 0 }}</p>
-        </div>
-    </section>
-
-    <h1 class="foreground">Event Description</h1>
-    <div id="event-description" class="secondary">
-        <p class="border foreground event-description">{{ event.description }}</p>
+<!-- Hero Image & Event Details Section -->
+<section class="flex md:h-96 flex-col md:flex-row gap-6 mb-8 items-start">
+    <!-- Hero Image Container -->
+    <div class="w-full md:h-full md:w-2/3 lg:w-3/4 aspect-video rounded-lg overflow-hidden shadow-lg bg-cover bg-center bg-no-repeat"
+        style="background-image: url('{{ event.image_url }}')" aria-label="Event Banner Image" role="img">
     </div>
 
-    <section id="ticket-price" class="ticket-purchase secondary">
-        <p class="foreground">💵 Price: ${{ "%.2f"|format(event.price) }}</p>
-
-        <form method="POST">
-            <button type="submit" class="btn primary primary-foreground border" {% if not user_registered and
-                (event.tickets_available | int) <=0 %}disabled{% endif %}>
-                {% if user_registered %}
-                Cancel Registration
-                {% else %}
-                Buy Ticket
-                {% endif %}
+    <!-- Event details card -->
+    <div
+        class="flex-1 md:h-full w-full px-0 md:px-6 py-6 space-y-4 rounded-lg /border /border-border /bg-secondary shadow-md text-foreground">
+        {# Icons now using text-primary as per your recent home page update style #}
+        <p class="flex items-center gap-2 text-lg"><span class="material-icons text-xl text-primary">event</span> Date:
+            <span class="font-semibold">{{ event.date }}</span>
+        </p>
+        <p class="flex items-center gap-2 text-lg">
+            <span class="material-icons text-xl text-primary">location_on</span>
+            Location: <span class="font-semibold">{{ event.location or "TBA" }}</span>
+        </p>
+        <p class="flex items-center gap-2 text-lg">
+            <span class="material-icons text-xl text-primary">group</span>
+            Attendees: <span class="font-semibold">{{ event.attendees or 0 }}</span>
+        </p>
+        <p class="flex items-center gap-2 text-lg">
+            <span class="material-icons text-xl text-primary">local_activity</span> Tickets Available:
+            <span class="font-semibold">{{ event.tickets_available or 0 }}</span>
+        </p>
+        <p class="flex items-center gap-2 text-lg">
+            <span class="material-icons text-xl text-primary">attach_money</span> Price:
+            <span class="font-semibold">{{ "%.2f"|format(event.price) }}</span>
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button type="button" id="share-event-btn" class="btn" title="Share this event">
+                <span class="material-icons text-lg mr-2">share</span> Share
             </button>
-        </form>
+            <form method="POST" class="space-y-4">
+                <button type="submit"
+                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-12 px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 w-full"
+                    {% if not user_registered and (event.tickets_available | int) <=0 %}disabled{% endif %}>
+                    {% if user_registered %}
+                    <span class="material-icons text-xl mr-2">person_remove</span> Leave Event
+                    {% else %}
+                    {% if (event.tickets_available | int) <=0 %} <span class="material-icons text-xl mr-2">cancel</span>
+                        Sold Out
+                        {% else %}
+                        <span class="material-icons text-xl mr-2">shopping_cart</span> Buy Ticket
+                        {% endif %}
+                        {% endif %}
+                </button>
+            </form>
+            {% if is_creator %}
+            <a href="/events/{{ event.id }}/edit" class="btn">
+                <span class="material-icons text-lg mr-2">edit</span> Edit
+            </a>
+            <form action="/events/{{ event.id }}/delete" method="POST">
+                <button type="submit" class="btn destructive size-full">
+                    <span class="material-icons text-lg mr-2">delete</span> Delete
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
 
-        <button type="button" id="share-event-btn" class="btn primary primary-foreground border"
-            title="Share this event">
-            Share Event
-        </button>
-    </section>
-</main>
+<!-- Event Description Section -->
+<h2 class="text-3xl font-bold text-foreground mb-4">Event Description</h2>
+<div class="p-6 rounded-lg border border-border bg-secondary shadow-md mb-8">
+    <p class="text-foreground leading-relaxed">{{ event.description }}</p>
+</div>
 
-<footer class="secondary">
-    <p class="foreground">&copy;2025 Planora - All Rights Reserved</p>
-</footer>
+<!-- Conditional Attendee List for Creators -->
+{% if is_creator %}
+<section class="mb-8">
+    <h2 class="text-3xl font-bold text-foreground mb-4">Attendees</h2>
+    <div class="relative w-full overflow-auto rounded-lg border border-border bg-secondary shadow-md">
+        <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+                <tr
+                    class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted text-muted-foreground">
+                    <th class="h-12 px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0 w-[50px]">S/N
+                    </th>
+                    <th class="h-12 px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0">Name</th>
+                    <th class="h-12 px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0">Email</th>
+                    {# REMOVED: Th for Actions column #}
+                </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+                {% if attendees %}
+                {% for attendee in attendees %} {# Assume 'attendees' is a list of objects from backend #}
+                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted text-foreground">
+                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0">{{ loop.index }}</td>
+                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium">{{ attendee.name }}</td>
+                    <td class="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground">{{ attendee.email
+                        }}</td>
+                    {# REMOVED: Td for Actions button #}
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr class="text-foreground">
+                    <td colspan="3" class="p-4 text-center text-muted-foreground">No attendees registered yet.</td>
+                    {# Updated colspan to 3 #}
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
 
 <script>
+    // This script remains the same
     const shareBtn = document.getElementById('share-event-btn');
     shareBtn?.addEventListener('click', async () => {
         const shareData = {
             title: '{{ event.title|e }}',
-            text: 'Check out this event on Planora!',
+            text: 'Check out this event on Planora: {{ event.title|e }}',
             url: window.location.href,
         };
 
@@ -167,18 +140,21 @@ Planora — Event: {{ event.title }}
                 await navigator.share(shareData);
                 console.log('Event shared successfully');
             } catch (err) {
-                alert('Sharing was cancelled or failed.');
+                if (err.name !== 'AbortError') {
+                    alert('Sharing was cancelled or failed.');
+                    console.error('Share failed:', err);
+                }
             }
         } else {
             try {
                 await navigator.clipboard.writeText(window.location.href);
                 alert('Event URL copied to clipboard!');
-            } catch {
-                alert('Share not supported on this browser.');
+            } catch (err) {
+                alert('Share not supported on this browser or clipboard access denied.');
+                console.error('Clipboard write failed:', err);
             }
         }
     });
 </script>
 
-<script src="/js/index.js"></script>
 {% endblock %}
