@@ -169,7 +169,7 @@ def get_event_by_id(event_id: int):
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT id, title, description, date, location, price, tickets_available
+        SELECT id, title, description, date, location, price, tickets_available, creator_id
         FROM events 
         WHERE id = ?
         """,
@@ -293,3 +293,73 @@ def get_upcoming_events() -> List[sqlite3.Row]:
     events = cursor.fetchall()
     conn.close()
     return events
+
+
+# Add this function to your existing database.py file
+
+
+def get_attendees_for_event(event_id: int):  # type: ignore
+    """
+    Fetches the list of attendees for a given event, including their user details
+    and registration ID.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT
+            r.id AS registration_id,
+            u.id AS user_id,
+            u.username AS name, -- Assuming username is what you want for 'name'
+            u.email
+        FROM registrations AS r
+        JOIN users AS u ON r.user_id = u.id
+        WHERE r.event_id = ?
+        ORDER BY u.username ASC -- Order attendees alphabetically by username
+        """,
+        (event_id,),
+    )
+    attendees_rows = cursor.fetchall()
+    conn.close()
+
+    # Convert rows to a list of dictionaries for easier template rendering
+    attendees_list = []
+    for row in attendees_rows:
+        attendees_list.append(dict(row))  # type: ignore
+    return attendees_list  # type: ignore
+
+
+# You might also want a function to delete a specific registration (by registration_id)
+# This would be called when the creator clicks the 'delete' button on an attendee row.
+def delete_registration_by_id(registration_id: int):
+    """
+    Deletes a specific event registration by its registration_id.
+    Also increments tickets_available for the associated event.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # First, get the event_id associated with this registration so we can increment tickets
+    cursor.execute(
+        "SELECT event_id FROM registrations WHERE id = ?", (registration_id,)
+    )
+    registration = cursor.fetchone()
+    if not registration:
+        conn.close()
+        return False  # Registration not found
+
+    event_id = registration["event_id"]
+
+    # Delete the registration
+    cursor.execute("DELETE FROM registrations WHERE id = ?", (registration_id,))
+    if cursor.rowcount > 0:
+        # Increment tickets_available by 1
+        cursor.execute(
+            "UPDATE events SET tickets_available = tickets_available + 1 WHERE id = ?",
+            (event_id,),
+        )
+        conn.commit()
+        conn.close()
+        return True
+    conn.close()
+    return False  # No registration was deleted

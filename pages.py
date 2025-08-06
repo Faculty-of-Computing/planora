@@ -22,26 +22,6 @@ def require_login():
         return redirect("/login")
 
 
-@pages.route("/home")
-def upcoming_events():
-    events = db.get_upcoming_events()
-
-    # Add image_url and attendees count for each event
-    event_list = []
-    for event in events:
-        event_dict = dict(event)
-        event_id = event_dict["id"]
-        event_dict["image_url"] = (
-            url_for("pages.event_image", event_id=event_id)
-            if db.event_has_image(event_id)
-            else "/images/planora.png"
-        )
-        event_dict["attendees"] = db.count_event_registrations(event_id)
-        event_list.append(event_dict)  # type: ignore
-
-    return render_template("home.html", events=event_list)
-
-
 @pages.route("/events/<int:event_id>/image")
 def event_image(event_id: int):
     conn = db.get_db_connection()
@@ -142,9 +122,16 @@ def event_details(event_id: int):
     )
 
     user_registered = db.is_user_registered_for_event(user_id, event_id)
+    attendees = db.get_attendees_for_event(event_id)  # type: ignore
+
+    is_creator = True if event["creator_id"] == user_id else False
 
     return render_template(
-        "event-details.html", event=event, user_registered=user_registered
+        "event-details.html",
+        event=event,
+        user_registered=user_registered,
+        is_creator=is_creator,
+        attendees=attendees,
     )
 
 
@@ -205,7 +192,7 @@ def ticket():
     return render_template("ticket.html")
 
 
-@pages.route("/event/<int:event_id>/edit", methods=["GET", "POST"])
+@pages.route("/events/<int:event_id>/edit", methods=["GET", "POST"])
 def edit_event(event_id: int):
     # Sample event data - replace with database query
     event = {
@@ -223,3 +210,21 @@ def edit_event(event_id: int):
         return redirect(url_for("pages.details", event_id=event_id))
 
     return render_template("edit-event.html", event=event)
+
+
+@pages.route("/home")
+def home():
+    events = db.get_upcoming_events()
+    # Add image_url and attendees count for each event
+    event_list = []
+    for event in events:
+        event_dict = dict(event)
+        event_id = event_dict["id"]
+        event_dict["image_url"] = (
+            url_for("pages.event_image", event_id=event_id)
+            if db.event_has_image(event_id)
+            else "/images/planora.png"
+        )
+        event_dict["attendees"] = db.count_event_registrations(event_id)
+        event_list.append(event_dict)  # type: ignore
+    return render_template("home.html", events=event_list)

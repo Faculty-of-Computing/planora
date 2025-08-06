@@ -1,15 +1,19 @@
 import db
 from pages import pages
 from api import api
-from flask import Flask, request
+from flask import Flask, request, Blueprint
 from public import public
 
 app = Flask(__name__, static_folder="static", static_url_path="")
+static = Blueprint(
+    "static", __name__, static_folder="static", static_url_path="/static"
+)
 
 # Register routers (Blueprints)
 app.register_blueprint(public)
 app.register_blueprint(pages)
 app.register_blueprint(api)
+app.register_blueprint(static)
 
 
 @app.context_processor

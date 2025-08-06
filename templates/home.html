@@ -1,121 +1,44 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 
 {% block title %}
-Planora — Event Management System
-{% endblock %}
-
-{% block head %}
-<link rel="stylesheet" href="/css/home.css" />
-<style>
-    .showcase-img-container {
-        width: 100%;
-        max-width: 200px;
-        /* limit max width */
-        height: 140px;
-        /* fixed height to control aspect ratio */
-        border-radius: 6px;
-        margin-bottom: 0.8rem;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        flex-shrink: 0;
-    }
-
-    /* Responsive adjustment */
-    @media (max-width: 768px) {
-        .showcase-img-container {
-            max-width: 100%;
-            height: 180px;
-        }
-    }
-</style>
+Planora - Event Management System
 {% endblock %}
 
 {% block body %}
-<nav class="secondary">
-    <!-- Product Logo -->
-    <div class="logo">
-        <img src="/images/planora.png" alt="Planora Logo">
+{% if events %}
+<div class="bg-secondary p-4 rounded-md grid grid-cols-1 md:flex justify-between items-center gap-y-4">
+    <div class="space-y-2">
+        <!-- FIXME EXTRCT FROM TEMPLATE -->
+        <h2 class="md:text-2xl font-bold line-clamp-1">
+            🎉 Featured: {{ events[0].title }}
+        </h2>
+        <p class="foreground">{{ events[0].date }} | {{ events[0].location }}</p>
     </div>
-    <!-- Desktop Menu -->
-    <div class="menu">
-        <div class="theme-toggler border">
-            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="Toggle Theme">
-        </div>
-        <div class="container">
-            <a href="/events/create" class="btn primary primary-foreground border">Create Event</a>
-        </div>
-    </div>
-    <!-- Mobile Menu -->
-    <div class="mobile-menu">
-        <div class="theme-toggler border">
-            <img src="/images/icons/moon-stars-svgrepo-com.svg" alt="Toggle Theme">
-        </div>
-        <!-- Hamburger icon -->
-        <div class="menu-icon">
-            <img src="/images/icons/menu-dark.svg" alt="Menu">
-        </div>
-        <div class="container background">
-            <!-- Close icon -->
-            <div class="close-icon">
-                <img src="/images/icons/close-dark.svg" alt="Close">
+    <!-- FIXME PROPER URL -->
+    <a href="/events/{{ events[0].id }}" class="btn primary">View Event</a>
+</div>
+
+<!-- FIXME ONLY RENDER IF NEW EVENTS -->
+<section class="space-y-4">
+    <h2 class="text-2xl font-bold">Upcoming Events</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {% for event in events[0:] %}
+        <!-- FIXME BACKGROUND IMAGE -->
+        <div class="bg-secondary space-y-4 p-4">
+            <div class="w-full //md:max-w-[200px] h-[180px] md:h-[140px] rounded-sm bg-center bg-no-repeat [box-shadow:0_4px_8px_rgba(0,0,0,0.1)] shrink-0 bg-cover"
+                style="background-image: url('{{ event.image_url }}')">
             </div>
-            <a href="/events/create" class="btn primary primary-foreground border">Create Event</a>
-        </div>
-    </div>
-</nav>
-
-<main class="background">
-    <!-- Featured Event -->
-    {% if events %}
-    <div class="featured-container secondary">
-        <div>
-            <h3 class="foreground" style="margin-bottom: 15px;">🎉 Featured: {{ events[0].title }}</h3>
-            <p class="foreground">{{ events[0].date }} | {{ events[0].location or "TBA" }}</p>
-        </div>
-        <div>
-            <a href="/events/{{ events[0].id }}" class="btn primary primary-foreground border">Learn More</a>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Upcoming Events List -->
-    {% if events|length > 1 %}
-    <section class="event-showcase-section foreground">
-        <h1>Upcoming Events</h1>
-        <div class="event-showcase-container">
-            {% for event in events[0:] %}
-            <div class="showcase-container secondary border">
-                <div class="showcase-img-container" style="background-image: url('{{ event.image_url }}')"
-                    aria-label="{{ event.title }} Banner Image" role="img"></div>
-                <div class="showcase-description-container">
-                    <div>
-                        <p class="showcase-title">{{ event.title }}</p>
-                        <p class="showcase-details">{{ event.date }} | {{ event.location or "TBA" }}</p>
-                    </div>
-                    <a href="/events/{{ event.id }}" class="btn primary primary-foreground">View</a>
+            <div class="flex flex-col sm:flex-row gap-y-3 sm:items-end justify-between">
+                <div class="space-y-1">
+                    <!-- FIXME -->
+                    <h3 class="font-semibold text-xl">{{ event.title }}</h3>
+                    <p>{{ event.date }} | {{ event.location }}</p>
                 </div>
+                <a href="/events/{{ event.id }}" class="btn primary w-full sm:w-auto">View</a>
             </div>
-            {% endfor %}
         </div>
-    </section>
-    {% endif %}
-</main>
-
-<footer class="secondary">
-    <p class="foreground">&copy;2025 Planora-All Rights Reserved</p>
-</footer>
-
-<script>
-    const urls = {
-        sun: "/images/icons/sun-svgrepo-com.svg",
-        moon: "/images/icons/moon-stars-svgrepo-com.svg",
-        closeDark: "/images/icons/close-dark.svg",
-        closeLight: "/images/icons/close-light.svg",
-        menuDark: "/images/icons/menu-dark.svg",
-        menuLight: "/images/icons/menu-light.svg"
-    };
-</script>
-<script src="/js/index.js"></script>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 {% endblock %}

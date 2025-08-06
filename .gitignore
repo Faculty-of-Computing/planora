@@ -4,3 +4,6 @@ templates/test.html
 .venv
 venv
 prisma
+package.json
+bun.lock
+node_modules
