@@ -24,7 +24,7 @@ Planora - Event Management System
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {% for event in events[0:] %}
         <!-- FIXME BACKGROUND IMAGE -->
-        <div class="bg-secondary space-y-4 p-4">
+        <a href="/events/{{ event.id }}" class="bg-secondary space-y-4 p-4">
             <div class="w-full //md:max-w-[200px] h-[180px] md:h-[140px] rounded-sm bg-center bg-no-repeat [box-shadow:0_4px_8px_rgba(0,0,0,0.1)] shrink-0 bg-cover"
                 style="background-image: url('{{ event.image_url }}')">
             </div>
@@ -34,9 +34,9 @@ Planora - Event Management System
                     <h3 class="font-semibold text-xl">{{ event.title }}</h3>
                     <p>{{ event.date }} | {{ event.location }}</p>
                 </div>
-                <a href="/events/{{ event.id }}" class="btn primary w-full sm:w-auto">View</a>
+                <button class="btn primary w-full sm:w-auto">View</button>
             </div>
-        </div>
+        </a>
         {% endfor %}
     </div>
 </section>

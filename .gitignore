@@ -7,3 +7,4 @@ prisma
 package.json
 bun.lock
 node_modules
+.vercel
