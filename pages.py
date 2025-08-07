@@ -135,18 +135,18 @@ def event_details(event_id: int):
     )
 
 
-@pages.route("/profile")
-def profile():
-    user_data = {
-        "name": "John Doe",
-        "email": "john@example.com",
-        "events": [
-            {"name": "Music Concert", "date": "Aug 5"},
-            {"name": "Tech Meetup", "date": "Aug 10"},
-            {"name": "Tech Meetup", "date": "Aug 10"},
-        ],
-    }
-    return render_template("userprofile.html", user=user_data)
+# @pages.route("/profile")
+# def profile():
+#     user_data = {
+#         "name": "John Doe",
+#         "email": "john@example.com",
+#         "events": [
+#             {"name": "Music Concert", "date": "Aug 5"},
+#             {"name": "Tech Meetup", "date": "Aug 10"},
+#             {"name": "Tech Meetup", "date": "Aug 10"},
+#         ],
+#     }
+#     return render_template("userprofile.html", user=user_data)
 
 
 @pages.route("/events/<int:event_id>/edit", methods=["GET", "POST"])

@@ -9,29 +9,6 @@ def get_db_connection():
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
-
-def reset_database():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("PRAGMA foreign_keys = OFF")
-    cursor.execute(
-        """
-        SELECT name 
-        FROM sqlite_master 
-        WHERE type='table' 
-        AND name NOT LIKE 'sqlite_%';
-        """
-    )
-    tables = cursor.fetchall()
-
-    for (table_name,) in tables:
-        cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
-
-    conn.commit()
-    conn.close()
-    print("Database reset: all tables and data deleted.")
-
-
 def create_tables():
     conn = get_db_connection()
     c = conn.cursor()

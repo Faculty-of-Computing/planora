@@ -6,6 +6,8 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 MarkupSafe==3.0.2
 packaging==25.0
-pillow==11.3.0
-qrcode==8.2
+types-click==7.1.8
+types-Jinja2==2.11.9
+types-MarkupSafe==1.1.10
+types-Werkzeug==1.0.9
 Werkzeug==3.1.3
