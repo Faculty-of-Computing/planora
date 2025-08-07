@@ -313,17 +313,11 @@
     width: 100%;
     height: 100%;
   }
-  .h-9 {
-    height: calc(var(--spacing) * 9);
-  }
   .h-10 {
     height: calc(var(--spacing) * 10);
   }
   .h-12 {
     height: calc(var(--spacing) * 12);
-  }
-  .h-96 {
-    height: calc(var(--spacing) * 96);
   }
   .h-\[180px\] {
     height: 180px;
@@ -331,17 +325,8 @@
   .h-full {
     height: 100%;
   }
-  .max-h-5 {
-    max-height: calc(var(--spacing) * 5);
-  }
   .max-h-48 {
     max-height: calc(var(--spacing) * 48);
-  }
-  .max-h-52 {
-    max-height: calc(var(--spacing) * 52);
-  }
-  .max-h-96 {
-    max-height: calc(var(--spacing) * 96);
   }
   .min-h-\[100px\] {
     min-height: 100px;
@@ -349,14 +334,8 @@
   .min-h-\[100vh\] {
     min-height: 100vh;
   }
-  .w-9 {
-    width: calc(var(--spacing) * 9);
-  }
   .w-\[50px\] {
     width: 50px;
-  }
-  .w-\[80px\] {
-    width: 80px;
   }
   .w-full {
     width: 100%;
@@ -364,20 +343,11 @@
   .max-w-2xl {
     max-width: var(--container-2xl);
   }
-  .max-w-sm {
-    max-width: var(--container-sm);
-  }
   .flex-1 {
     flex: 1;
   }
-  .flex-shrink {
-    flex-shrink: 1;
-  }
   .shrink-0 {
     flex-shrink: 0;
-  }
-  .flex-grow {
-    flex-grow: 1;
   }
   .grow-\[1\] {
     flex-grow: 1;
@@ -385,23 +355,14 @@
   .caption-bottom {
     caption-side: bottom;
   }
-  .border-collapse {
-    border-collapse: collapse;
-  }
   .cursor-pointer {
     cursor: pointer;
-  }
-  .resize {
-    resize: both;
   }
   .grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
   .grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .flex-col {
     flex-direction: column;
@@ -417,9 +378,6 @@
   }
   .justify-center {
     justify-content: center;
-  }
-  .justify-start {
-    justify-content: flex-start;
   }
   .gap-2 {
     gap: calc(var(--spacing) * 2);
@@ -521,13 +479,6 @@
     --tw-border-style: dashed;
     border-style: dashed;
   }
-  .border-solid {
-    --tw-border-style: solid;
-    border-style: solid;
-  }
-  .border-accent {
-    border-color: var(--accent);
-  }
   .border-border {
     border-color: var(--border);
   }
@@ -536,21 +487,6 @@
   }
   .border-red-400 {
     border-color: var(--color-red-400);
-  }
-  .\!bg-background {
-    background-color: var(--background) !important;
-  }
-  .\!bg-input {
-    background-color: var(--input) !important;
-  }
-  .\!bg-input\/10 {
-    background-color: var(--input) !important;
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--input) 10%, transparent) !important;
-    }
-  }
-  .bg-accent {
-    background-color: var(--accent);
   }
   .bg-background {
     background-color: var(--background);
@@ -579,9 +515,6 @@
   .object-cover {
     object-fit: cover;
   }
-  .p-0 {
-    padding: calc(var(--spacing) * 0);
-  }
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
@@ -594,9 +527,6 @@
   .p-6 {
     padding: calc(var(--spacing) * 6);
   }
-  .p-8 {
-    padding: calc(var(--spacing) * 8);
-  }
   .px-0 {
     padding-inline: calc(var(--spacing) * 0);
   }
@@ -606,17 +536,11 @@
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
   }
-  .px-6 {
-    padding-inline: calc(var(--spacing) * 6);
-  }
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
   }
   .py-3 {
     padding-block: calc(var(--spacing) * 3);
-  }
-  .py-6 {
-    padding-block: calc(var(--spacing) * 6);
   }
   .py-8 {
     padding-block: calc(var(--spacing) * 8);
@@ -626,9 +550,6 @@
   }
   .text-left {
     text-align: left;
-  }
-  .text-right {
-    text-align: right;
   }
   .align-middle {
     vertical-align: middle;
@@ -648,10 +569,6 @@
   .text-6xl {
     font-size: var(--text-6xl);
     line-height: var(--tw-leading, var(--text-6xl--line-height));
-  }
-  .text-base {
-    font-size: var(--text-base);
-    line-height: var(--tw-leading, var(--text-base--line-height));
   }
   .text-lg {
     font-size: var(--text-lg);
@@ -688,9 +605,6 @@
   .whitespace-nowrap {
     white-space: nowrap;
   }
-  .text-accent-foreground {
-    color: var(--accent-foreground);
-  }
   .text-destructive-foreground {
     color: var(--destructive-foreground);
   }
@@ -712,9 +626,6 @@
   .text-secondary-foreground {
     color: var(--secondary-foreground);
   }
-  .underline {
-    text-decoration-line: underline;
-  }
   .shadow-lg {
     --tw-shadow: var(--shadow-lg);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
@@ -723,19 +634,11 @@
     --tw-shadow: var(--shadow-md);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .shadow-xl {
-    --tw-shadow: var(--shadow-xl);
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
   .\[box-shadow\:0_4px_8px_rgba\(0\,0\,0\,0\.1\)\] {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   }
   .ring-offset-background {
     --tw-ring-offset-color: var(--background);
-  }
-  .outline {
-    outline-style: var(--tw-outline-style);
-    outline-width: 1px;
   }
   .transition-colors {
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
@@ -778,26 +681,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--accent);
-      }
-    }
-  }
-  .hover\:bg-accent\/80 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--accent);
-        @supports (color: color-mix(in lab, red, red)) {
-          background-color: color-mix(in oklab, var(--accent) 80%, transparent);
-        }
-      }
-    }
-  }
-  .hover\:bg-destructive\/90 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--destructive);
-        @supports (color: color-mix(in lab, red, red)) {
-          background-color: color-mix(in oklab, var(--destructive) 90%, transparent);
-        }
       }
     }
   }
@@ -1278,11 +1161,6 @@ body {
   inherits: false;
   initial-value: 0 0 #0000;
 }
-@property --tw-outline-style {
-  syntax: "*";
-  inherits: false;
-  initial-value: solid;
-}
 @property --tw-duration {
   syntax: "*";
   inherits: false;
@@ -1308,7 +1186,6 @@ body {
       --tw-ring-offset-width: 0px;
       --tw-ring-offset-color: #fff;
       --tw-ring-offset-shadow: 0 0 #0000;
-      --tw-outline-style: solid;
       --tw-duration: initial;
     }
   }

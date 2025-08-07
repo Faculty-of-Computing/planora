@@ -26,7 +26,7 @@ so we can just focus on the content within this block. #}
 
     <!-- Event details card -->
     <div
-        class="flex-1 md:h-full w-full px-0 md:px-6 py-6 space-y-4 rounded-lg /border /border-border /bg-secondary shadow-md text-foreground">
+        class="flex-1 md:h-full w-full px-0 md:px-6 space-y-4 rounded-lg /border /border-border /bg-secondary shadow-md text-foreground">
         {# Icons now using text-primary as per your recent home page update style #}
         <p class="flex items-center gap-2 text-lg"><span class="material-icons text-xl text-primary">event</span> Date:
             <span class="font-semibold">{{ event.date }}</span>
@@ -47,19 +47,28 @@ so we can just focus on the content within this block. #}
             <span class="material-icons text-xl text-primary">attach_money</span> Price:
             <span class="font-semibold">{{ "%.2f"|format(event.price) }}</span>
         </p>
+        <p class="flex items-center gap-2 text-lg">
+            <span class="material-icons text-xl text-primary">person_add_alt_1</span> Attending:
+            <span class="font-semibold">
+                {% if user_registered %}
+                Yes
+                {% else %}
+                No
+                {% endif %}
+            </span>
+        </p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button type="button" id="share-event-btn" class="btn" title="Share this event">
                 <span class="material-icons text-lg mr-2">share</span> Share
             </button>
             <form method="POST" class="space-y-4">
-                <button type="submit"
-                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-base font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-12 px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 w-full"
-                    {% if not user_registered and (event.tickets_available | int) <=0 %}disabled{% endif %}>
+                <button type="submit" class="btn size-full {% if user_registered %}destructive{% endif %}" {% if not
+                    user_registered and (event.tickets_available | int) <=0 %}disabled{% endif %}>
                     {% if user_registered %}
-                    <span class="material-icons text-xl mr-2">person_remove</span> Leave Event
+                    <span class="material-icons text-xl mr-2">person_remove</span> Leave
                     {% else %}
-                    {% if (event.tickets_available | int) <=0 %} <span class="material-icons text-xl mr-2">cancel</span>
-                        Sold Out
+                    {% if (event.tickets_available | int) <= 0 %} <span class="material-icons text-xl mr-2">
+                        cancel</span> Sold Out
                         {% else %}
                         <span class="material-icons text-xl mr-2">shopping_cart</span> Buy Ticket
                         {% endif %}
