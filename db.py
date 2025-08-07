@@ -363,3 +363,78 @@ def delete_registration_by_id(registration_id: int):
         return True
     conn.close()
     return False  # No registration was deleted
+
+
+# Add this function to your existing database.py file
+
+
+def update_event(
+    event_id: int,
+    title: str,
+    description: str,
+    date: str,
+    location: str,
+    price: float,
+    tickets_available: int,
+    image_file: FileStorage,
+):
+    """
+    Updates an existing event's details.
+
+    Args:
+        event_id: The ID of the event to update.
+        title: The new title of the event.
+        description: The new description of the event.
+        date: The new date of the event (ISO date string).
+        location: The new location of the event.
+        price: The new price of the event.
+        tickets_available: The new number of tickets available.
+        image_file: An optional new image FileStorage object. If None, the
+                    existing image will be kept.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if image_file and image_file.filename != "":
+        image_bytes = image_file.read()
+        image_mime = image_file.mimetype
+        cursor.execute(
+            """
+            UPDATE events
+            SET title = ?, description = ?, date = ?, location = ?, price = ?,
+                tickets_available = ?, image = ?, image_mime = ?
+            WHERE id = ?
+            """,
+            (
+                title,
+                description,
+                date,
+                location,
+                price,
+                tickets_available,
+                image_bytes,
+                image_mime,
+                event_id,
+            ),
+        )
+    else:
+        cursor.execute(
+            """
+            UPDATE events
+            SET title = ?, description = ?, date = ?, location = ?, price = ?,
+                tickets_available = ?
+            WHERE id = ?
+            """,
+            (
+                title,
+                description,
+                date,
+                location,
+                price,
+                tickets_available,
+                event_id,
+            ),
+        )
+
+    conn.commit()
+    conn.close()

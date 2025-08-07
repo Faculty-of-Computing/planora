@@ -149,65 +149,70 @@ def profile():
     return render_template("userprofile.html", user=user_data)
 
 
-@pages.route("/events/<int:event_id>/attendees")
-def attendees(event_id: int):
-    # Sample data - replace with actual database query
-    sample_attendees = [
-        {
-            "name": "Alice Johnson",
-            "email": "alice@example.com",
-            "ticket_type": "General Admission",
-        },
-        {"name": "Bob Smith", "email": "bob@example.com", "ticket_type": "VIP Ticket"},
-        {
-            "name": "Cynthia Lee",
-            "email": "cynthia@example.com",
-            "ticket_type": "General Admission",
-        },
-        {
-            "name": "Morpheus Endless",
-            "email": "dreamking@example.com",
-            "ticket_type": "General Admission",
-        },
-        {
-            "name": "Okarun Momochan",
-            "email": "okarun@example.com",
-            "ticket_type": "General Admission",
-        },
-        {
-            "name": "Cole Palmer",
-            "email": "palmer@example.com",
-            "ticket_type": "VVIP Ticket",
-        },
-    ]
-
-    # Get event details - replace with actual database query
-    event = {"id": event_id, "name": "Music Concert"}
-
-    return render_template("attendees.html", attendees=sample_attendees, event=event)
-
-
-@pages.route("/ticket/<int:ticket_id>")
-def ticket():
-    return render_template("ticket.html")
-
-
 @pages.route("/events/<int:event_id>/edit", methods=["GET", "POST"])
 def edit_event(event_id: int):
-    # Sample event data - replace with database query
-    event = {
-        "id": event_id,
-        "name": "Music Concert",
-        "date": "2025-08-05",
-        "location": "Main Hall",
-        "description": "This music concert brings together...",
-        "image_url": "path/to/image.jpg",
-    }
+    event = db.get_event_by_id(event_id)
+    user_id = int(request.cookies.get("user_id"))  # type: ignore
+
+    if not event:
+        abort(404)
+
+    if event["creator_id"] != user_id:
+        return redirect(url_for("pages.event_details", event_id=event_id))
+
+    if db.event_has_image(event_id):
+        event["image_url"] = url_for("pages.event_image", event_id=event_id)
+
+    def render_with_error(error: str):
+        return render_template("edit-event.html", event=event, error=error)
 
     if request.method == "POST":
-        # Handle form submission
-        # Update event in database
-        return redirect(url_for("pages.details", event_id=event_id))
+        # Data Validation
+        title: str = request.form.get("title")  # type: ignore
+        date: str = request.form.get("date")  # type: ignore
+        location: str = request.form.get("location")  # type: ignore
+        description: str = request.form.get("description")  # type: ignore
+        price_str = request.form.get("price", "0.0")
+        tickets_available_str = request.form.get("tickets_available", "0")
+        image_file = request.files.get("image")
+
+        if title == "" or date == "" or location == "" or description == "":
+            return render_with_error("Please fill all required fields")
+
+        try:
+            price = float(price_str)
+            if price < 0:
+                return render_with_error("Price cannot be negative.")
+        except ValueError:
+            return render_with_error(
+                "Invalid price format. Please enter a valid number."
+            )
+
+        try:
+            tickets_available = int(tickets_available_str)
+            if tickets_available < 0:
+                return render_with_error("Tickets available cannot be negative.")
+        except ValueError:
+            return render_with_error(
+                "Invalid number of tickets. Please enter a whole number."
+            )
+
+        try:
+            db.update_event(
+                event_id,
+                title,
+                description,
+                date,
+                location,
+                price,
+                tickets_available,
+                image_file,  # type: ignore
+            )
+            return redirect(url_for("pages.event_details", event_id=event_id))
+        except Exception as e:
+            return render_with_error(
+                f"An error occurred while updating the event: {str(e)}"
+            )
 
     return render_template("edit-event.html", event=event)
 

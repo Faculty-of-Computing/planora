@@ -1,109 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Event - Planora</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit-event.css') }}">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar secondary border">
-        <div class="nav-brand">Planora</div>
-        <div class="nav-controls">
-            <button class="theme-toggler border">
-                <img src="{{ url_for('static', filename='images/icons/sun-svgrepo-com.svg') }}" alt="theme toggle">
-            </button>
-            <button class="logout-btn btn">Logout</button>
-            <div class="menu-icon">
-                <img src="{{ url_for('static', filename='images/icons/menu-dark.svg') }}" alt="menu">
-            </div>
-        </div>
-    </nav>
+{% extends "base2.html" %}
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu">
-        <div class="container background">
-            <div class="close-icon">
-                <img src="{{ url_for('static', filename='images/icons/close-dark.svg') }}" alt="close">
-            </div>
-            <button class="logout-btn btn">Logout</button>
-        </div>
+{% block title %}
+Edit {{ event.title }} - Planora
+{% endblock %}
+
+{% block body %}
+<div class="flex-1 space-y-8 my-6 mx-4">
+    <h1 class="text-4xl font-extrabold text-foreground mb-6 text-center md:text-left">
+        Edit Event
+    </h1>
+
+    {% if error %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline">{{ error }}</span>
     </div>
+    {% endif %}
 
-    <!-- Main Content -->
-    <main class="container background">
-        <h1 class="page-title">Edit Event</h1>
-
-        <form class="edit-form" method="POST" enctype="multipart/form-data">
-            <div class="form-grid">
-                <div class="form-left">
-                    <div class="form-group">
-                        <label for="event-name">Event Name</label>
-                        <input type="text" id="event-name" name="name" value="{{ event.name }}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="event-date">Date</label>
-                        <input type="date" id="event-date" name="date" value="{{ event.date }}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="event-location">Location</label>
-                        <input type="text" id="event-location" name="location" value="{{ event.location }}" required>
-                    </div>
+    <form class="space-y-6" method="POST" enctype="multipart/form-data">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label for="event-name" class="text-sm font-medium text-foreground">Event Title</label>
+                    <input type="text" id="event-name" name="title" value="{{ event.title }}" required
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                 </div>
 
-                <div class="form-right">
-                    <div class="form-group">
-                        <label>Event Image</label>
-                        <div class="image-upload-container" id="upload-container">
-                            {% if event.image_url %}
-                            <div class="image-preview">
-                                <img src="{{ event.image_url }}" alt="Event image" id="preview-image" class="preview-image">
-                            </div>
-                            {% else %}
-                            <div class="upload-placeholder">
-                                <svg viewBox="0 0 24 24" class="upload-icon">
-                                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-7l-3 3.72L9 13l-3 4h12l-4-5z"/>
-                                </svg>
-                            </div>
-                            {% endif %}
-                            <input type="file" id="image-upload" name="image" accept="image/*" class="hidden">
-                            <label for="image-upload" class="upload-label">Choose Image</label>
+                <div class="space-y-2">
+                    <label for="event-date" class="text-sm font-medium text-foreground">Date</label>
+                    <input type="date" id="event-date" name="date" value="{{ event.date }}" required
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="event-location" class="text-sm font-medium text-foreground">Location</label>
+                    <input type="text" id="event-location" name="location" value="{{ event.location }}" required
+                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-foreground">Event Image</label>
+                <div
+                    class="flex flex-col items-center justify-center p-3 border-2 border-dashed border-input rounded-md cursor-pointer hover:bg-muted/50 transition-colors duration-200">
+                    <input type="file" id="image-upload" name="image" accept="image/*" class="hidden"
+                        onchange="previewImage(event)">
+                    <label for="image-upload" class="flex flex-col items-center cursor-pointer">
+                        {% if event.image_url %}
+                        <div class="relative w-full aspect-video">
+                            <img src="{{ event.image_url }}" alt="Event image" id="preview-image"
+                                class="w-full h-full max-h-48 object-cover rounded-md">
                         </div>
-                    </div>
+                        {% else %}
+                        <div id="upload-placeholder" class="text-center">
+                            <span class="material-icons text-6xl text-muted-foreground">image</span>
+                            <p class="text-muted-foreground mt-2">Click to upload an image</p>
+                        </div>
+                        <img src="" alt="Image preview" id="preview-image"
+                            class="hidden w-full h-full object-cover rounded-md">
+                        {% endif %}
+                    </label>
                 </div>
             </div>
+        </div>
 
-            <div class="form-group full-width">
-                <label for="event-description">Description</label>
-                <textarea id="event-description" name="description" rows="5" required>{{ event.description }}</textarea>
-            </div>
+        <div class="space-y-2">
+            <label for="event-description" class="text-sm font-medium text-foreground">Description</label>
+            <textarea id="event-description" name="description" rows="5" required
+                class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[100px]">{{ event.description }}</textarea>
+        </div>
 
-            <div class="button-group">
-                <a href="#" class="btn cancel-btn border">Cancel</a>
-                <button type="submit" class="btn save-btn primary">Save Changes</button>
-            </div>
-        </form>
-    </main>
+        <div class="flex flex-col md:flex-row gap-4">
+            <a href="/events/{{ event.id }}" class="btn destructive md:flex-1">
+                <span class="material-icons text-lg mr-2">cancel</span> Cancel
+            </a>
+            <button type="submit" class="btn md:flex-1">
+                <span class="material-icons text-lg mr-2">save</span> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+<script>
+    function previewImage(event) {
+        const [file] = event.target.files;
+        const preview = document.getElementById('preview-image');
+        const placeholder = document.getElementById('upload-placeholder');
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('hidden');
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+            }
+        } else {
+            preview.src = '';
+            preview.classList.add('hidden');
+            if (placeholder) {
+                placeholder.classList.remove('hidden');
+            }
+        }
+    }
 
-    <!-- Footer -->
-    <footer class="footer secondary border">
-        <p>&copy; 2025 Planora - All rights reserved</p>
-    </footer>
-
-    <!-- Scripts -->
-    <script>
-        const urls = {
-            sun: "{{ url_for('static', filename='images/icons/sun-svgrepo-com.svg') }}",
-            moon: "{{ url_for('static', filename='images/icons/moon-stars-svgrepo-com.svg') }}",
-            closeDark: "{{ url_for('static', filename='images/icons/close-dark.svg') }}",
-            closeLight: "{{ url_for('static', filename='images/icons/close-light.svg') }}",
-            menuDark: "{{ url_for('static', filename='images/icons/menu-dark.svg') }}",
-            menuLight: "{{ url_for('static', filename='images/icons/menu-light.svg') }}"
-        };
-    </script>
-    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-</body>
-</html>
+    document.addEventListener('DOMContentLoaded', () => {
+        const preview = document.getElementById('preview-image');
+        const placeholder = document.getElementById('upload-placeholder');
+        if (preview && preview.src && preview.src.includes('http')) {
+            // Image already exists, so hide placeholder if present
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+                preview.classList.remove('hidden');
+            }
+        } else {
+            // No image URL, show placeholder
+            preview.classList.add('hidden');
+            if (placeholder) {
+                placeholder.classList.remove('hidden');
+            }
+        }
+    });
+</script>
+{% endblock %}
