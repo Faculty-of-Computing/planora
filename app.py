@@ -1,7 +1,12 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from flask import Flask
 import db
 from pages import pages
 from public import public
+
 
 app = Flask(__name__, static_folder="static", static_url_path="/static")
 

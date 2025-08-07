@@ -1,103 +1,140 @@
-import sqlite3
+import os
+from typing import List, Optional, TypedDict
+from psycopg import connect, Connection
+from psycopg.rows import dict_row
+from psycopg.errors import UniqueViolation, Error
 from werkzeug.datastructures import FileStorage
-from typing import List
 
 
-def get_db_connection():
-    conn = sqlite3.connect("planora.db")
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
+class EventImage(TypedDict):
+    image: bytes
+    image_mime: str
 
 
-def create_tables():
+class User(TypedDict):
+    id: int
+    username: str
+    email: str
+    password_hash: str
+
+
+class Event(TypedDict):
+    id: int
+    title: str
+    description: str
+    date: str
+    location: str
+    price: float
+    tickets_available: int
+    creator_id: int
+
+
+class Registration(TypedDict):
+    registration_id: int
+    user_id: int
+    name: str
+    email: str
+
+
+env = {
+    "name": os.getenv("POSTGRES_DATABASE"),
+    "user": os.getenv("POSTGRES_USER"),
+    "password": os.getenv("POSTGRES_PASSWORD"),
+    "host": os.getenv("POSTGRES_HOST"),
+}
+
+
+def get_db_connection() -> Connection:
+    if not all(env.values()):
+        raise EnvironmentError("Missing PostgreSQL environment variables")
+    return connect(
+        f"dbname={env['name']} user={env['user']} password={env['password']} host={env['host']}",
+        row_factory=dict_row,  # type: ignore
+    )
+
+
+def create_tables() -> None:
     conn = get_db_connection()
-    c = conn.cursor()
-
-    # Users table
-    c.execute(
+    cur = conn.cursor()
+    cur.execute(
         """
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             email TEXT UNIQUE NOT NULL,
             username TEXT NOT NULL,
             password_hash TEXT NOT NULL
-        )
-        """
+        );
+    """
     )
-
-    # Events table with tickets_available column added
-    c.execute(
+    cur.execute(
         """
         CREATE TABLE IF NOT EXISTS events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            creator_id INTEGER NOT NULL,
+            id SERIAL PRIMARY KEY,
+            creator_id INTEGER NOT NULL REFERENCES users(id),
             title TEXT NOT NULL,
             description TEXT NOT NULL,
-            date TEXT NOT NULL, -- ISO date string
+            date DATE NOT NULL,
             location TEXT,
-            price REAL,
-            tickets_available INTEGER NOT NULL DEFAULT 0, -- new column for tickets
-            image BLOB, -- Store binary image data
-            image_mime TEXT, -- Store MIME type (e.g., image/png)
-            FOREIGN KEY (creator_id) REFERENCES users(id)
-        )
-        """
+            price DOUBLE PRECISION,
+            tickets_available INTEGER NOT NULL DEFAULT 0,
+            image BYTEA,
+            image_mime TEXT
+        );
+    """
     )
-
-    # Registrations table
-    c.execute(
+    cur.execute(
         """
         CREATE TABLE IF NOT EXISTS registrations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            event_id INTEGER NOT NULL,
-            UNIQUE(user_id, event_id),
-            FOREIGN KEY (user_id) REFERENCES users(id),
-            FOREIGN KEY (event_id) REFERENCES events(id)
-        )
-        """
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            event_id INTEGER NOT NULL REFERENCES events(id),
+            UNIQUE(user_id, event_id)
+        );
+    """
     )
-
     conn.commit()
     conn.close()
 
 
-def insert_user(email: str, username: str, password: str):
+def insert_user(email: str, username: str, password: str) -> int:
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)",
+            """
+            INSERT INTO users (email, username, password_hash)
+            VALUES (%s, %s, %s)
+            RETURNING id
+        """,
             (email, username, password),
         )
-        user_id = cursor.lastrowid
+        user_id = cursor.fetchone()["id"]  # type: ignore
         conn.commit()
-    except sqlite3.IntegrityError as e:
-        raise ValueError("Email or username already exists") from e
+        return user_id  # type: ignore
+    except UniqueViolation:
+        raise ValueError("Email or username already exists")
     finally:
         conn.close()
-    return user_id
 
 
-def get_user_by_email(email: str):
+def get_user_by_email(email: str) -> Optional[User]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT id, username, password_hash FROM users WHERE email = ?", (email,)
+        "SELECT id, username, password_hash FROM users WHERE email = %s", (email,)
     )
     user = cursor.fetchone()
     conn.close()
-    return user
+    return user  # type: ignore
 
 
-def get_user_by_id(user_id: int):
+def get_user_by_id(user_id: int) -> Optional[User]:
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, username, email FROM users WHERE id = ?", (user_id,))
+    cursor.execute("SELECT id, username, email FROM users WHERE id = %s", (user_id,))
     user = cursor.fetchone()
     conn.close()
-    return user
+    return user  # type: ignore
 
 
 def insert_event(
@@ -109,21 +146,17 @@ def insert_event(
     price: float,
     tickets_available: int,
     image_file: FileStorage,
-):
-    """
-    image_file: FileStorage object from Flask (request.files['image'])
-    """
+) -> int:
     conn = get_db_connection()
     cursor = conn.cursor()
-
     image_bytes = image_file.read()
     image_mime = image_file.mimetype
-
     cursor.execute(
         """
         INSERT INTO events (creator_id, title, description, date, location, price, tickets_available, image, image_mime)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
+    """,
         (
             creator_id,
             title,
@@ -136,46 +169,43 @@ def insert_event(
             image_mime,
         ),
     )
-    event_id = cursor.lastrowid
+    event_id = cursor.fetchone()["id"]  # type: ignore
     conn.commit()
     conn.close()
-    return event_id
+    return event_id  # type: ignore
 
 
-def get_event_by_id(event_id: int):
+def get_event_by_id(event_id: int) -> Optional[Event]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
         SELECT id, title, description, date, location, price, tickets_available, creator_id
-        FROM events 
-        WHERE id = ?
-        """,
+        FROM events WHERE id = %s
+    """,
         (event_id,),
     )
     row = cursor.fetchone()
     conn.close()
-    if row:
-        return dict(row)
-    return None
+    return dict(row) if row else None  # type: ignore
 
 
 def count_event_registrations(event_id: int) -> int:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT COUNT(*) AS count FROM registrations WHERE event_id = ?", (event_id,)
+        "SELECT COUNT(*) AS count FROM registrations WHERE event_id = %s", (event_id,)
     )
-    count = cursor.fetchone()["count"]
+    count = cursor.fetchone()["count"]  # type: ignore
     conn.close()
-    return count
+    return count  # type: ignore
 
 
 def event_has_image(event_id: int) -> bool:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT image FROM events WHERE id = ? AND image IS NOT NULL AND LENGTH(image) > 0",
+        "SELECT 1 FROM events WHERE id = %s AND image IS NOT NULL AND LENGTH(image) > 0",
         (event_id,),
     )
     exists = cursor.fetchone() is not None
@@ -187,7 +217,7 @@ def is_user_registered_for_event(user_id: int, event_id: int) -> bool:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT 1 FROM registrations WHERE user_id = ? AND event_id = ?",
+        "SELECT 1 FROM registrations WHERE user_id = %s AND event_id = %s",
         (user_id, event_id),
     )
     exists = cursor.fetchone() is not None
@@ -196,154 +226,107 @@ def is_user_registered_for_event(user_id: int, event_id: int) -> bool:
 
 
 def register_user_for_event(user_id: int, event_id: int) -> bool:
-    """
-    Attempt to register user for event.
-    Return True if registered, False if no tickets available or already registered.
-    """
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    # Check if user already registered
     cursor.execute(
-        "SELECT 1 FROM registrations WHERE user_id = ? AND event_id = ?",
+        "SELECT 1 FROM registrations WHERE user_id = %s AND event_id = %s",
         (user_id, event_id),
     )
     if cursor.fetchone():
         conn.close()
-        return False  # Already registered
-
-    # Check tickets availability
-    cursor.execute("SELECT tickets_available FROM events WHERE id = ?", (event_id,))
+        return False
+    cursor.execute("SELECT tickets_available FROM events WHERE id = %s", (event_id,))
     row = cursor.fetchone()
-    if not row or row["tickets_available"] <= 0:
+    if not row or row["tickets_available"] <= 0:  # type: ignore
         conn.close()
-        return False  # No tickets available
-
-    # Proceed to register user
+        return False
     try:
         cursor.execute(
-            "INSERT INTO registrations (user_id, event_id) VALUES (?, ?)",
+            "INSERT INTO registrations (user_id, event_id) VALUES (%s, %s)",
             (user_id, event_id),
         )
-        # Decrement tickets_available by 1
         cursor.execute(
-            "UPDATE events SET tickets_available = tickets_available - 1 WHERE id = ?",
+            "UPDATE events SET tickets_available = tickets_available - 1 WHERE id = %s",
             (event_id,),
         )
         conn.commit()
         return True
-    except sqlite3.IntegrityError:
+    except UniqueViolation:
         return False
     finally:
         conn.close()
 
 
-def unregister_user_from_event(user_id: int, event_id: int):
+def unregister_user_from_event(user_id: int, event_id: int) -> None:
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    # Delete registration
     cursor.execute(
-        "DELETE FROM registrations WHERE user_id = ? AND event_id = ?",
+        "DELETE FROM registrations WHERE user_id = %s AND event_id = %s",
         (user_id, event_id),
     )
     if cursor.rowcount > 0:
-        # Increase tickets_available by 1 only if a registration was deleted
         cursor.execute(
-            "UPDATE events SET tickets_available = tickets_available + 1 WHERE id = ?",
+            "UPDATE events SET tickets_available = tickets_available + 1 WHERE id = %s",
             (event_id,),
         )
     conn.commit()
     conn.close()
 
 
-def get_upcoming_events() -> List[sqlite3.Row]:
+def get_upcoming_events() -> List[Event]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
         SELECT id, title, description, date, location, price, tickets_available
-        FROM events
-        WHERE date >= date('now')
-        ORDER BY date ASC
-        """
+        FROM events WHERE date >= CURRENT_DATE ORDER BY date ASC
+    """
     )
     events = cursor.fetchall()
     conn.close()
-    return events
+    return events  # type: ignore
 
 
-# Add this function to your existing database.py file
-
-
-def get_attendees_for_event(event_id: int):  # type: ignore
-    """
-    Fetches the list of attendees for a given event, including their user details
-    and registration ID.
-    """
+def get_attendees_for_event(event_id: int) -> List[Registration]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT
-            r.id AS registration_id,
-            u.id AS user_id,
-            u.username AS name, -- Assuming username is what you want for 'name'
-            u.email
+        SELECT r.id AS registration_id, u.id AS user_id, u.username AS name, u.email
         FROM registrations AS r
         JOIN users AS u ON r.user_id = u.id
-        WHERE r.event_id = ?
-        ORDER BY u.username ASC -- Order attendees alphabetically by username
-        """,
+        WHERE r.event_id = %s
+        ORDER BY u.username ASC
+    """,
         (event_id,),
     )
-    attendees_rows = cursor.fetchall()
+    attendees = cursor.fetchall()
     conn.close()
-
-    # Convert rows to a list of dictionaries for easier template rendering
-    attendees_list = []
-    for row in attendees_rows:
-        attendees_list.append(dict(row))  # type: ignore
-    return attendees_list  # type: ignore
+    return [dict(row) for row in attendees]  # type: ignore
 
 
-# You might also want a function to delete a specific registration (by registration_id)
-# This would be called when the creator clicks the 'delete' button on an attendee row.
-def delete_registration_by_id(registration_id: int):
-    """
-    Deletes a specific event registration by its registration_id.
-    Also increments tickets_available for the associated event.
-    """
+def delete_registration_by_id(registration_id: int) -> bool:
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    # First, get the event_id associated with this registration so we can increment tickets
     cursor.execute(
-        "SELECT event_id FROM registrations WHERE id = ?", (registration_id,)
+        "SELECT event_id FROM registrations WHERE id = %s", (registration_id,)
     )
     registration = cursor.fetchone()
     if not registration:
         conn.close()
-        return False  # Registration not found
-
-    event_id = registration["event_id"]
-
-    # Delete the registration
-    cursor.execute("DELETE FROM registrations WHERE id = ?", (registration_id,))
+        return False
+    event_id = registration["event_id"]  # type: ignore
+    cursor.execute("DELETE FROM registrations WHERE id = %s", (registration_id,))
     if cursor.rowcount > 0:
-        # Increment tickets_available by 1
         cursor.execute(
-            "UPDATE events SET tickets_available = tickets_available + 1 WHERE id = ?",
-            (event_id,),
+            "UPDATE events SET tickets_available = tickets_available + 1 WHERE id = %s",
+            (event_id,),  # type: ignore
         )
         conn.commit()
         conn.close()
         return True
     conn.close()
-    return False  # No registration was deleted
-
-
-# Add this function to your existing database.py file
+    return False
 
 
 def update_event(
@@ -354,35 +337,20 @@ def update_event(
     location: str,
     price: float,
     tickets_available: int,
-    image_file: FileStorage,
-):
-    """
-    Updates an existing event's details.
-
-    Args:
-        event_id: The ID of the event to update.
-        title: The new title of the event.
-        description: The new description of the event.
-        date: The new date of the event (ISO date string).
-        location: The new location of the event.
-        price: The new price of the event.
-        tickets_available: The new number of tickets available.
-        image_file: An optional new image FileStorage object. If None, the
-                    existing image will be kept.
-    """
+    image_file: Optional[FileStorage],
+) -> None:
     conn = get_db_connection()
     cursor = conn.cursor()
-
     if image_file and image_file.filename != "":
         image_bytes = image_file.read()
         image_mime = image_file.mimetype
         cursor.execute(
             """
             UPDATE events
-            SET title = ?, description = ?, date = ?, location = ?, price = ?,
-                tickets_available = ?, image = ?, image_mime = ?
-            WHERE id = ?
-            """,
+            SET title = %s, description = %s, date = %s, location = %s, price = %s,
+                tickets_available = %s, image = %s, image_mime = %s
+            WHERE id = %s
+        """,
             (
                 title,
                 description,
@@ -399,50 +367,38 @@ def update_event(
         cursor.execute(
             """
             UPDATE events
-            SET title = ?, description = ?, date = ?, location = ?, price = ?,
-                tickets_available = ?
-            WHERE id = ?
-            """,
-            (
-                title,
-                description,
-                date,
-                location,
-                price,
-                tickets_available,
-                event_id,
-            ),
+            SET title = %s, description = %s, date = %s, location = %s, price = %s,
+                tickets_available = %s
+            WHERE id = %s
+        """,
+            (title, description, date, location, price, tickets_available, event_id),
         )
-
     conn.commit()
     conn.close()
 
 
-# Add this function to your existing database.py file
-
-
-def delete_event(event_id: int):
-    """
-    Deletes an event and all associated registrations from the database.
-    """
+def delete_event(event_id: int) -> bool:
     conn = get_db_connection()
     cursor = conn.cursor()
-
     try:
-        # Enable foreign key support for cascade delete simulation
-        cursor.execute("PRAGMA foreign_keys = ON")
-
-        # Delete all registrations for the event first
-        cursor.execute("DELETE FROM registrations WHERE event_id = ?", (event_id,))
-
-        # Now delete the event itself
-        cursor.execute("DELETE FROM events WHERE id = ?", (event_id,))
-
+        cursor.execute("DELETE FROM registrations WHERE event_id = %s", (event_id,))
+        cursor.execute("DELETE FROM events WHERE id = %s", (event_id,))
         conn.commit()
-    except sqlite3.Error as e:
+        return True
+    except Error as e:
         print(f"Database error during event deletion: {e}")
         conn.rollback()
         return False
     finally:
         conn.close()
-    return True
+
+
+def get_event_image(event_id: int) -> Optional[EventImage]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT image, image_mime FROM events WHERE id = %s", (event_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row and row["image"]:  # type: ignore
+        return EventImage(image=row["image"], image_mime=row["image_mime"])  # type: ignore
+    return None
