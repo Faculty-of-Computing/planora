@@ -233,3 +233,26 @@ def home():
         event_dict["attendees"] = db.count_event_registrations(event_id)
         event_list.append(event_dict)  # type: ignore
     return render_template("home.html", events=event_list)
+
+
+@pages.route("/events/<int:event_id>/delete", methods=["POST"])
+def delete_event(event_id: int):
+    # Retrieve the event from the database
+    event = db.get_event_by_id(event_id)
+    user_id = int(request.cookies.get("user_id"))  # type: ignore
+
+    # Check if the event exists
+    if not event:
+        return redirect("/home")
+
+    # Authorization: Check if the current user is the creator of the event
+    if event["creator_id"] != user_id:
+        return redirect(url_for("event_details", event_id=event_id))
+
+    # Attempt to delete the event
+    success = db.delete_event(event_id)
+
+    if success:
+        return redirect("/home")
+    else:
+        return redirect(url_for("pages.event_details", event_id=event_id))

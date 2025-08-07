@@ -9,6 +9,7 @@ def get_db_connection():
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
+
 def create_tables():
     conn = get_db_connection()
     c = conn.cursor()
@@ -415,3 +416,33 @@ def update_event(
 
     conn.commit()
     conn.close()
+
+
+# Add this function to your existing database.py file
+
+
+def delete_event(event_id: int):
+    """
+    Deletes an event and all associated registrations from the database.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Enable foreign key support for cascade delete simulation
+        cursor.execute("PRAGMA foreign_keys = ON")
+
+        # Delete all registrations for the event first
+        cursor.execute("DELETE FROM registrations WHERE event_id = ?", (event_id,))
+
+        # Now delete the event itself
+        cursor.execute("DELETE FROM events WHERE id = ?", (event_id,))
+
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Database error during event deletion: {e}")
+        conn.rollback()
+        return False
+    finally:
+        conn.close()
+    return True
