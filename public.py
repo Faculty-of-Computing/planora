@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect
 import db
-import sqlite3
 import utils
 
 
@@ -29,7 +28,7 @@ def login():
                 "login.html", error="Email and Password are required!"
             )
 
-        user: sqlite3.Row = db.get_user_by_email(email)
+        user = db.get_user_by_email(email)
 
         if not user:
             return render_template("login.html", error="User not found!")
@@ -59,7 +58,7 @@ def register():
                 username=username.strip().lower(),
                 password=password.strip(),
             )
-            if user_id is None:
+            if user_id is None: # type: ignore
                 raise ValueError("Email or username already exists")
             return utils.set_user_cookie_and_recirect(int(user_id))
         except ValueError as e:
