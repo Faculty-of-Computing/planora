@@ -4,7 +4,7 @@ load_dotenv()
 
 from flask import Flask
 import db
-from pages import pages
+from private import private
 from public import public
 
 
@@ -12,7 +12,7 @@ app = Flask(__name__, static_folder="static", static_url_path="/static")
 
 # Register routers (Blueprints)
 app.register_blueprint(public)
-app.register_blueprint(pages)
+app.register_blueprint(private)
 
 
 db.create_tables()

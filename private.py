@@ -11,17 +11,17 @@ from flask import (
 import utils
 import db
 
-pages = Blueprint("pages", __name__)
+private = Blueprint("private", __name__)
 
 
 # SECTION MIDDLEWARE TO REQUIRE AUTH
-@pages.before_request
+@private.before_request
 def require_login():
     if not utils.user_is_authenticated():
         return redirect("/login")
 
 
-@pages.route("/events/<int:event_id>/image")
+@private.route("/events/<int:event_id>/image")
 def event_image(event_id: int):
     image_data = db.get_event_image(event_id)
     if image_data:
@@ -29,7 +29,7 @@ def event_image(event_id: int):
     abort(404)
 
 
-@pages.route("/events/create", methods=["POST", "GET"])
+@private.route("/events/create", methods=["POST", "GET"])
 def create_event():
     if request.method == "GET":
         return render_template("create-event.html", error=None)
@@ -84,7 +84,7 @@ def create_event():
     return redirect(f"/events/{event_id}")
 
 
-@pages.route("/events/<int:event_id>", methods=["GET", "POST"])
+@private.route("/events/<int:event_id>", methods=["GET", "POST"])
 def event_details(event_id: int):
     user_id = int(request.cookies.get("user_id"))  # type: ignore
 
@@ -93,7 +93,7 @@ def event_details(event_id: int):
             db.unregister_user_from_event(user_id, event_id)
         else:
             db.register_user_for_event(user_id, event_id)
-        return redirect(url_for("pages.event_details", event_id=event_id))
+        return redirect(url_for("private.event_details", event_id=event_id))
 
     event = db.get_event_by_id(event_id)
     if not event:
@@ -102,7 +102,7 @@ def event_details(event_id: int):
     event["attendees"] = db.count_event_registrations(event_id)  # type: ignore
 
     event["image_url"] = (  # type: ignore
-        url_for("pages.event_image", event_id=event_id)
+        url_for("private.event_image", event_id=event_id)
         if db.event_has_image(event_id)
         else "/images/planora.png"
     )
@@ -121,7 +121,7 @@ def event_details(event_id: int):
     )
 
 
-@pages.route("/events/<int:event_id>/edit", methods=["GET", "POST"])
+@private.route("/events/<int:event_id>/edit", methods=["GET", "POST"])
 def edit_event(event_id: int):
     event = db.get_event_by_id(event_id)
     user_id = int(request.cookies.get("user_id"))  # type: ignore
@@ -130,10 +130,10 @@ def edit_event(event_id: int):
         abort(404)
 
     if event["creator_id"] != user_id:
-        return redirect(url_for("pages.event_details", event_id=event_id))
+        return redirect(url_for("private.event_details", event_id=event_id))
 
     if db.event_has_image(event_id):
-        event["image_url"] = url_for("pages.event_image", event_id=event_id)  # type: ignore
+        event["image_url"] = url_for("private.event_image", event_id=event_id)  # type: ignore
 
     def render_with_error(error: str):
         return render_template("edit-event.html", event=event, error=error)
@@ -179,7 +179,7 @@ def edit_event(event_id: int):
                 tickets_available,
                 image_file,
             )
-            return redirect(url_for("pages.event_details", event_id=event_id))
+            return redirect(url_for("private.event_details", event_id=event_id))
         except Exception as e:
             return render_with_error(
                 f"An error occurred while updating the event: {str(e)}"
@@ -188,7 +188,7 @@ def edit_event(event_id: int):
     return render_template("edit-event.html", event=event)
 
 
-@pages.route("/home")
+@private.route("/home")
 def home():
     events = db.get_upcoming_events()
     event_list = []
@@ -196,7 +196,7 @@ def home():
         event_dict: db.Event = dict(event)  # type: ignore
         event_id = event_dict["id"]
         event_dict["image_url"] = (  # type: ignore
-            url_for("pages.event_image", event_id=event_id)
+            url_for("private.event_image", event_id=event_id)
             if db.event_has_image(event_id)  # type: ignore
             else "/images/planora.png"
         )
@@ -205,7 +205,7 @@ def home():
     return render_template("home.html", events=event_list)
 
 
-@pages.route("/events/<int:event_id>/delete", methods=["POST"])
+@private.route("/events/<int:event_id>/delete", methods=["POST"])
 def delete_event(event_id: int):
     event = db.get_event_by_id(event_id)
     user_id = int(request.cookies.get("user_id"))  # type: ignore
@@ -214,17 +214,17 @@ def delete_event(event_id: int):
         return redirect("/home")
 
     if event["creator_id"] != user_id:
-        return redirect(url_for("pages.event_details", event_id=event_id))
+        return redirect(url_for("private.event_details", event_id=event_id))
 
     success = db.delete_event(event_id)
 
     if success:
         return redirect("/home")
     else:
-        return redirect(url_for("pages.event_details", event_id=event_id))
+        return redirect(url_for("private.event_details", event_id=event_id))
 
 
-@pages.route("/logout")
+@private.route("/logout")
 def logout():
     response = make_response(redirect("/"))
     response.delete_cookie("user_id")  # type: ignore
