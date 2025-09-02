@@ -1,38 +1,33 @@
 from flask import (
-    Response,
-    render_template,
     Blueprint,
+    abort,
+    Response,
     request,
+    render_template,
     redirect,
     url_for,
-    abort,
-    make_response,
+    flash,
 )
-import utils
-import db
-
-private = Blueprint("private", __name__)
+import models.db as db
+from flask_login import login_required, current_user  # type: ignore
 
 
-# SECTION MIDDLEWARE TO REQUIRE AUTH
-@private.before_request
-def require_login():
-    if not utils.user_is_authenticated():
-        return redirect("/login")
+events = Blueprint("events", __name__, url_prefix="/events")
 
 
-@private.route("/events/<int:event_id>/image")
-def event_image(event_id: int):
+@events.route("/<int:event_id>/image")
+def image(event_id: int):
     image_data = db.get_event_image(event_id)
     if image_data:
         return Response(image_data["image"], mimetype=image_data["image_mime"])
     abort(404)
 
 
-@private.route("/events/create", methods=["POST", "GET"])
-def create_event():
+@events.route("/create", methods=["POST", "GET"])
+@login_required  # type: ignore
+def create():
     if request.method == "GET":
-        return render_template("create-event.html", error=None)
+        return render_template("create-event.html")
 
     user_id: str = request.cookies.get("user_id")  # type: ignore
 
@@ -47,27 +42,25 @@ def create_event():
     if not (
         title and description and date and price and tickets_available and image_file
     ):
-        return render_template(
-            "create-event.html", error="Please fill in all required fields."
-        )
+        flash("Please fill in all required fields.")
+        return render_template("create-event.html")
 
     try:
         creator_id = int(user_id)
         price_val = float(price)
         tickets_available_val = int(tickets_available)
         if price_val < 0:
-            return render_template(
-                "create-event.html", error="Price must be zero or positive."
-            )
+            flash("Price must be zero or positive.")
+            return render_template("create-event.html")
         if tickets_available_val < 0:
+            flash("Tickets available must be zero or positive.")
             return render_template(
                 "create-event.html",
-                error="Tickets available must be zero or positive.",
             )
     except ValueError:
+        flash("Invalid user ID, price, or tickets available.")
         return render_template(
             "create-event.html",
-            error="Invalid user ID, price, or tickets available.",
         )
 
     event_id = db.insert_event(
@@ -81,20 +74,11 @@ def create_event():
         image_file=image_file,
     )
 
-    return redirect(f"/events/{event_id}")
+    return redirect(url_for("events.details", event_id=event_id))
 
 
-@private.route("/events/<int:event_id>", methods=["GET", "POST"])
-def event_details(event_id: int):
-    user_id = int(request.cookies.get("user_id"))  # type: ignore
-
-    if request.method == "POST":
-        if db.is_user_registered_for_event(user_id, event_id):
-            db.unregister_user_from_event(user_id, event_id)
-        else:
-            db.register_user_for_event(user_id, event_id)
-        return redirect(url_for("private.event_details", event_id=event_id))
-
+@events.route("/<int:event_id>", methods=["GET"])
+def details(event_id: int):
     event = db.get_event_by_id(event_id)
     if not event:
         abort(404, description="Event not found")
@@ -102,10 +86,12 @@ def event_details(event_id: int):
     event["attendees"] = db.count_event_registrations(event_id)  # type: ignore
 
     event["image_url"] = (  # type: ignore
-        url_for("private.event_image", event_id=event_id)
+        url_for("events.image", event_id=event_id)
         if db.event_has_image(event_id)
         else "/images/planora.png"
     )
+
+    user_id = int(current_user.id) if current_user.is_authenticated else -1
 
     user_registered = db.is_user_registered_for_event(user_id, event_id)
     attendees = db.get_attendees_for_event(event_id)
@@ -121,22 +107,35 @@ def event_details(event_id: int):
     )
 
 
-@private.route("/events/<int:event_id>/edit", methods=["GET", "POST"])
+@events.route("/<int:event_id>", methods=["POST"])
+@login_required  # type: ignore
+def rsvp(event_id: int):
+    user_id = int(current_user.id)
+    if db.is_user_registered_for_event(user_id, event_id):
+        db.unregister_user_from_event(user_id, event_id)
+    else:
+        db.register_user_for_event(user_id, event_id)
+    return redirect(url_for("events.details", event_id=event_id))
+
+
+@events.route("/<int:event_id>/edit", methods=["GET", "POST"])
+@login_required  # type: ignore
 def edit_event(event_id: int):
     event = db.get_event_by_id(event_id)
-    user_id = int(request.cookies.get("user_id"))  # type: ignore
+    user_id = int(current_user.id)  # type: ignore
 
     if not event:
         abort(404)
 
     if event["creator_id"] != user_id:
-        return redirect(url_for("private.event_details", event_id=event_id))
+        return redirect(url_for("events.details", event_id=event_id))
 
     if db.event_has_image(event_id):
-        event["image_url"] = url_for("private.event_image", event_id=event_id)  # type: ignore
+        event["image_url"] = url_for("events.image", event_id=event_id)  # type: ignore
 
     def render_with_error(error: str):
-        return render_template("edit-event.html", event=event, error=error)
+        flash(error)
+        return render_template("edit-event.html", event=event)
 
     if request.method == "POST":
         title: str = request.form.get("title", "").strip()
@@ -179,7 +178,7 @@ def edit_event(event_id: int):
                 tickets_available,
                 image_file,
             )
-            return redirect(url_for("private.event_details", event_id=event_id))
+            return redirect(url_for("events.details", event_id=event_id))
         except Exception as e:
             return render_with_error(
                 f"An error occurred while updating the event: {str(e)}"
@@ -188,44 +187,20 @@ def edit_event(event_id: int):
     return render_template("edit-event.html", event=event)
 
 
-@private.route("/home")
-def home():
-    events = db.get_upcoming_events()
-    event_list = []
-    for event in events:
-        event_dict: db.Event = dict(event)  # type: ignore
-        event_id = event_dict["id"]
-        event_dict["image_url"] = (  # type: ignore
-            url_for("private.event_image", event_id=event_id)
-            if db.event_has_image(event_id)  # type: ignore
-            else "/images/planora.png"
-        )
-        event_dict["attendees"] = db.count_event_registrations(event_id)  # type: ignore
-        event_list.append(event_dict)  # type: ignore
-    return render_template("home.html", events=event_list)
-
-
-@private.route("/events/<int:event_id>/delete", methods=["POST"])
+@events.route("/<int:event_id>/delete", methods=["POST"])
 def delete_event(event_id: int):
     event = db.get_event_by_id(event_id)
-    user_id = int(request.cookies.get("user_id"))  # type: ignore
+    user_id = int(current_user.id)  # type: ignore
 
     if not event:
-        return redirect("/home")
+        return redirect(url_for("public.index"))
 
     if event["creator_id"] != user_id:
-        return redirect(url_for("private.event_details", event_id=event_id))
+        return redirect(url_for("events.details", event_id=event_id))
 
     success = db.delete_event(event_id)
 
     if success:
-        return redirect("/home")
+        return redirect(url_for("public.index"))
     else:
-        return redirect(url_for("private.event_details", event_id=event_id))
-
-
-@private.route("/logout")
-def logout():
-    response = make_response(redirect("/"))
-    response.delete_cookie("user_id")  # type: ignore
-    return response
+        return redirect(url_for("events.details", event_id=event_id))

@@ -121,7 +121,8 @@ def get_user_by_email(email: str) -> Optional[User]:
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT id, username, password_hash FROM users WHERE email = %s", (email,)
+        "SELECT id, username, password_hash, email FROM users WHERE email = %s",
+        (email,),
     )
     user = cursor.fetchone()
     conn.close()
@@ -131,7 +132,21 @@ def get_user_by_email(email: str) -> Optional[User]:
 def get_user_by_id(user_id: int) -> Optional[User]:
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, username, email FROM users WHERE id = %s", (user_id,))
+    cursor.execute(
+        "SELECT id, username, password_hash, email FROM users WHERE id = %s", (user_id,)
+    )
+    user = cursor.fetchone()
+    conn.close()
+    return user  # type: ignore
+
+
+def get_user_by_username(username: str) -> Optional[User]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, username, password_hash, email FROM users WHERE username = %s",
+        (username,),
+    )
     user = cursor.fetchone()
     conn.close()
     return user  # type: ignore

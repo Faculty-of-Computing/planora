@@ -17,10 +17,10 @@
 </head>
 
 <body class="flex flex-col min-h-[100vh]">
-    <nav class="bg-secondary //sticky top-0 z-50 shadow-md">
+    <nav class="bg-secondary sticky top-0 z-50 shadow-md">
         <!-- SECTION DESKTOP NAV -->
         <div class="flex justify-between items-center p-4">
-            <a href="/home">
+            <a href="{{ url_for('public.index') if current_user.is_authenticated else url_for('public.index') }}">
                 <div class="flex items-center gap-x-2">
                     <img src="/static/images/planora.png" class="size-12" alt="Planora Logo" />
                     <span class="font-semibold text-3xl text-foreground">Planora</span>
@@ -33,40 +33,58 @@
                     <span class="material-icons text-2xl text-foreground dark:!hidden">dark_mode</span>
                     <span class="material-icons text-2xl text-foreground !hidden dark:!inline">light_mode</span>
                 </button>
-                <a href="/events/create" class="p-2 rounded-full hover:bg-accent transition-colors"
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('events.create') }}" class="p-2 rounded-full hover:bg-accent transition-colors"
                     aria-label="Create Event">
                     <span class="material-icons text-2xl text-foreground">add_circle</span>
                 </a>
-                <a href="/" class="p-2 rounded-full hover:bg-accent transition-colors" aria-label="Home Page">
+                <a href="{{ url_for('public.index') }}" class="p-2 rounded-full hover:bg-accent transition-colors"
+                    aria-label="Home Page">
                     <span class="material-icons text-2xl text-foreground">home</span>
                 </a>
-                <a href="/logout" class="p-2 rounded-full hover:bg-accent transition-colors" aria-label="Logout">
+                <a href="{{ url_for('public.logout') }}" class="p-2 rounded-full hover:bg-accent transition-colors"
+                    aria-label="Logout">
                     <span class="material-icons text-2xl text-foreground">logout</span>
                 </a>
+                {% else %}
+                <a href="{{ url_for('public.login') }}" class="p-2 rounded-full hover:bg-accent transition-colors"
+                    aria-label="Login">
+                    <span class="material-icons text-2xl text-foreground">account_circle</span>
+                </a>
+                {% endif %}
             </div>
         </div>
 
-        <!-- SETION MOBILE NAV -->
+        <!-- SECTION MOBILE NAV -->
         <div class="md:hidden bg-secondary border-t border-border py-2">
-            <div class="grid grid-cols-4">
+            <div class="grid {% if current_user.is_authenticated %} grid-cols-4 {% else %} grid-cols-2 {% endif %}">
                 <button id="theme-toggle-mobile"
                     class="w-full text-center py-2 px-4 hover:bg-accent flex items-center justify-center gap-x-2 rounded-md"
                     aria-label="Toggle dark mode">
                     <span class="material-icons text-2xl text-foreground dark:!hidden">dark_mode</span>
                     <span class="material-icons text-2xl text-foreground !hidden dark:!inline">light_mode</span>
                 </button>
-                <a href="/events/create"
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('events.create') }}"
                     class="w-full text-center py-2 px-4 hover:bg-accent flex items-center justify-center gap-x-2 rounded-md">
                     <span class="material-icons text-2xl text-foreground">add_circle</span>
                 </a>
-                <a href="/"
+                <a href="{{ url_for('public.index') }}"
                     class="w-full text-center py-2 px-4 hover:bg-accent flex items-center justify-center gap-x-2 rounded-md">
                     <span class="material-icons text-2xl text-foreground">home</span>
                 </a>
-                <a href="/logout"
+                <a href="{{ url_for('public.logout') }}"
                     class="w-full text-center py-2 px-4 hover:bg-accent flex items-center justify-center gap-x-2 rounded-md">
                     <span class="material-icons text-2xl text-foreground">logout</span>
                 </a>
+                {% else %}
+                <a href="{{ url_for('public.login') }}"
+                    class="w-full text-center py-2 px-4 hover:bg-accent flex items-center justify-center gap-x-2 rounded-md">
+                    <span class="material-icons text-2xl text-foreground">account_circle</span>
+                </a>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -115,9 +133,11 @@
             }
         });
     </script>
+
     <main class="my-6 mx-4 space-y-8 grow-[1]">
         {% block body %}{% endblock %}
     </main>
+
     <footer class="bg-secondary p-4 text-center">
         <p class="text-secondary-foreground">&copy;2025 Planora - All Rights Reserved</p>
     </footer>

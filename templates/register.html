@@ -6,15 +6,19 @@
 <div class="container">
   <h2>Create an Account</h2>
 
-  <!-- Display single error message -->
-  {% if error %}
+  <!-- Display flash messages -->
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
   <div class="error-message">
-    <p>{{ error }}</p>
+    {% for msg in messages %}
+    <p>{{ msg }}</p>
+    {% endfor %}
   </div>
   {% endif %}
+  {% endwith %}
 
-  <!-- <form action="/api/auth/register" method="POST"> -->
   <form method="POST">
+    <input type="hidden" name="next" value="{{ redirect_to or '' }}">
     <div class="form-group">
       <label for="email">Email Address</label>
       <input type="email" id="email" name="email" value="{{ request.form.get('email', '') }}" required />
