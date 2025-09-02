@@ -29,7 +29,7 @@ def create():
     if request.method == "GET":
         return render_template("create-event.html")
 
-    user_id: str = request.cookies.get("user_id")  # type: ignore
+    user_id: str = current_user.id  # type: ignore
 
     title = request.form.get("title", "").strip()
     description = request.form.get("description", "").strip()
