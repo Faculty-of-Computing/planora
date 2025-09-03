@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path=".env.test")
 
 import os
 import models.db as db

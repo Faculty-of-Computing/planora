@@ -362,8 +362,8 @@ def update_event(
         cursor.execute(
             """
             UPDATE events
-            SET title = %s, description = %s, date = %s, location = %s, price = %s,
-                tickets_available = %s, image = %s, image_mime = %s
+            SET title = %s, description = %s, date = %s, location = %s,
+                 image = %s, image_mime = %s
             WHERE id = %s
         """,
             (
@@ -371,8 +371,6 @@ def update_event(
                 description,
                 date,
                 location,
-                price,
-                tickets_available,
                 image_bytes,
                 image_mime,
                 event_id,
@@ -382,11 +380,10 @@ def update_event(
         cursor.execute(
             """
             UPDATE events
-            SET title = %s, description = %s, date = %s, location = %s, price = %s,
-                tickets_available = %s
+            SET title = %s, description = %s, date = %s, location = %s,
             WHERE id = %s
         """,
-            (title, description, date, location, price, tickets_available, event_id),
+            (title, description, date, location, event_id),
         )
     conn.commit()
     conn.close()
